@@ -1,0 +1,10 @@
+{
+  "name": "js-tmsp-example",
+  "version": "0.0.1",
+  "description": "Javascript TMSP example application",
+  "main": "app.js",
+  "dependencies": {
+    "js-tmsp": "0.0.1"
+  }
+}
+

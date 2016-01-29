@@ -28,11 +28,11 @@ CounterApp.prototype.append_tx = function(cb, txBytes) {
 		}	
     var txValue = txBytes.readIntBE(0, txBytes.length);
 		if (txValue != this.txCount){
-      return cb(tmsp.types.RetCodeInvalidNonce, "", "Nonce is invalid");
+      return cb(tmsp.RetCodeInvalidNonce, "", "Nonce is invalid");
 		}
 	}
 	this.txCount += 1;
-	return cb(tmsp.types.RetCodeOK, "", "");
+	return cb(tmsp.RetCodeOK, "", "");
 }
 
 CounterApp.prototype.check_tx = function(cb, txBytes) {
@@ -44,11 +44,11 @@ CounterApp.prototype.check_tx = function(cb, txBytes) {
 		}	
     var txValue = txBytes.readIntBE(0, txBytes.length);
 		if (txValue < this.txCount){
-      return cb(tmsp.types.RetCodeInvalidNonce, "", "Nonce is too low");
+      return cb(tmsp.RetCodeInvalidNonce, "", "Nonce is too low");
 		}
 	}
 	this.txCount += 1;
-	return cb(tmsp.types.RetCodeOK, "", "");
+	return cb(tmsp.RetCodeOK, "", "");
 }
 
 CounterApp.prototype.get_hash = function(cb) {
@@ -68,5 +68,5 @@ CounterApp.prototype.query = function(cb) {
 console.log("Counter app in Javascript");
 
 var app = new CounterApp();
-var appServer = new tmsp.server.AppServer(app);
+var appServer = new tmsp.AppServer(app);
 appServer.server.listen(46658);
