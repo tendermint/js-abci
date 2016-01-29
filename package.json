@@ -1,0 +1,10 @@
+{
+  "name": "js-tmsp",
+  "version": "0.0.1",
+  "description": "Javascript TMSP libraries",
+  "main": "index.js",
+  "dependencies": {
+    "js-wire": "0.0.2"
+  }
+}
+
