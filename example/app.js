@@ -68,5 +68,5 @@ CounterApp.prototype.query = function(cb) {
 console.log("Counter app in Javascript");
 
 var app = new CounterApp();
-var appServer = new tmsp.AppServer(app);
+var appServer = new tmsp.Server(app);
 appServer.server.listen(46658);

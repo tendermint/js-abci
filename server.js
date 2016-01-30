@@ -2,12 +2,11 @@ var net = require("net");
 var wire = require("js-wire");
 var msg = require("./msgs");
 var types = require("./types");
-
-var maxWriteBufferLength = 4096; // Any more and flush
+var Connection = require("./connection").Connection;
 
 // Takes an application and handles TMSP connection
 // which invoke methods on the app
-function AppServer(app){
+function Server(app) {
   // set the app for the socket handler
   this.app = app;
 
@@ -17,7 +16,7 @@ function AppServer(app){
   this.createServer();
 }
 
-AppServer.prototype.createServer = function() {
+Server.prototype.createServer = function() {
   var app = this.app;
 
   // Define the socket handler
@@ -69,73 +68,6 @@ AppServer.prototype.createServer = function() {
   });
 }
 
-//----------------------------------------
-
-function Connection(socket, msgCb) {
-  this.socket = socket;
-  this.recvBuf = new Buffer(0);
-  this.sendBuf = new Buffer(0);
-  this.msgCb = msgCb;
-  this.waitingResult = false;
-  var conn = this;
-
-  // Handle TMSP requests.
-  socket.on('data', function(data) {
-    conn.appendData(data);
-  });
-  socket.on('end', function() {
-    console.log("connection ended");
-  });
-}
-
-Connection.prototype.appendData = function(bytes) {
-  var conn = this;
-  if (bytes.length > 0) {
-    this.recvBuf = Buffer.concat([this.recvBuf, new Buffer(bytes)]);
-  }
-  if (this.waitingResult) {
-    return;
-  }
-  var r = new wire.Reader(this.recvBuf);
-  var msg;
-  try {
-    msg = r.readByteArray();
-  } catch(e) {
-    return;
-  }
-  this.recvBuf = r.buf.slice(r.offset);
-  this.waitingResult = true;
-  this.socket.pause();
-  //try {
-    this.msgCb(msg, function() {
-      // This gets called after msg handler is finished with response.
-      conn.waitingResult = false;
-      conn.socket.resume();
-      if (conn.recvBuf.length > 0) {
-        conn.appendData("");
-      }
-    });
-  //} catch(e) {
-  //  console.log("FATAL ERROR: ", e);
-  //}
+module.exports = {
+  Server: Server,
 };
-
-Connection.prototype.writeMessage = function(msgBytes) {
-  var msgLength = wire.uvarintSize(msgBytes.length);
-  var buf = new Buffer(1+msgLength+msgBytes.length);
-  var w = new wire.Writer(buf);
-  w.writeByteArray(msgBytes); // TODO technically should be writeVarint
-  this.sendBuf = Buffer.concat([this.sendBuf, w.getBuffer()]);
-  if (this.sendBuf.length >= maxWriteBufferLength) {
-    this.flush();
-  }
-};
-
-Connection.prototype.flush = function() {
-  var n = this.socket.write(this.sendBuf);
-  this.sendBuf = new Buffer(0);
-}
-
-//----------------------------------------
-
-module.exports = { AppServer: AppServer };
