@@ -26,26 +26,26 @@ var makeWriteResponseInfo = function(w, cb) { return runOnce("info", function(in
   w.writeString(info);
   cb(w);
 });};
-var makeWriteResponseSetOption = function(w, cb) { return runOnce("set_option", function(log) {
+var makeWriteResponseSetOption = function(w, cb) { return runOnce("setOption", function(log) {
   w.writeUint8(types.ResponseTypeSetOption);
   w.writeString(log);
   cb(w);
 });};
-var makeWriteResponseAppendTx = function(w, cb) { return runOnce("append_tx", function(code, result, log) {
+var makeWriteResponseAppendTx = function(w, cb) { return runOnce("appendTx", function(code, result, log) {
   w.writeUint8(types.ResponseTypeAppendTx);
   w.writeUint8(code);
   w.writeByteArray(result);
   w.writeString(log);
   cb(w);
 });};
-var makeWriteResponseCheckTx = function(w, cb) { return runOnce("check_tx", function(code, result, log) {
+var makeWriteResponseCheckTx = function(w, cb) { return runOnce("checkTx", function(code, result, log) {
   w.writeUint8(types.ResponseTypeCheckTx);
   w.writeUint8(code);
   w.writeByteArray(result);
   w.writeString(log);
   cb(w);
 });};
-var makeWriteResponseGetHash = function(w, cb) { return runOnce("get_hash", function(hash, log) {
+var makeWriteResponseGetHash = function(w, cb) { return runOnce("getHash", function(hash, log) {
   w.writeUint8(types.ResponseTypeGetHash);
   w.writeByteArray(hash);
   w.writeString(log);
@@ -63,26 +63,26 @@ module.exports = {
     0x01 : "echo",
     0x02 : "flush",
     0x03 : "info",
-    0x04 : "set_option",
-    0x21 : "append_tx",
-    0x22 : "check_tx",
-    0x23 : "get_hash",
+    0x04 : "setOption",
+    0x21 : "appendTx",
+    0x22 : "checkTx",
+    0x23 : "getHash",
     0x24 : "query",
   },
   readers : {
     "info":       readRequestInfo,
-    "set_option": readRequestSetOption,
-    "append_tx":  readRequestAppendTx,
-    "check_tx":   readRequestCheckTx,
-    "get_hash":   readRequestGetHash,
+    "setOption":  readRequestSetOption,
+    "appendTx":   readRequestAppendTx,
+    "checkTx":    readRequestCheckTx,
+    "getHash":    readRequestGetHash,
     "query":      readRequestQuery,
   },
   writerGenerators: {
     "info":       makeWriteResponseInfo,
-    "set_option": makeWriteResponseSetOption,
-    "append_tx":  makeWriteResponseAppendTx,
-    "check_tx":   makeWriteResponseCheckTx,
-    "get_hash":   makeWriteResponseGetHash,
+    "setOption":  makeWriteResponseSetOption,
+    "appendTx":   makeWriteResponseAppendTx,
+    "checkTx":    makeWriteResponseCheckTx,
+    "getHash":    makeWriteResponseGetHash,
     "query":      makeWriteResponseQuery,
   },
 };

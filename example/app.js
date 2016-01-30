@@ -12,14 +12,14 @@ CounterApp.prototype.info = function(cb) {
   return cb(util.format("hashes:%d, txs:%d", this.hashCount, this.txCount));
 }
 
-CounterApp.prototype.set_option = function(cb, key, value) {
+CounterApp.prototype.setOption = function(cb, key, value) {
 	if (key == "serial" && value == "on") {
 		this.serial = true;
 	}
   return cb("");
 }
 
-CounterApp.prototype.append_tx = function(cb, txBytes) {
+CounterApp.prototype.appendTx = function(cb, txBytes) {
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
@@ -35,7 +35,7 @@ CounterApp.prototype.append_tx = function(cb, txBytes) {
 	return cb(tmsp.RetCodeOK, "", "");
 }
 
-CounterApp.prototype.check_tx = function(cb, txBytes) {
+CounterApp.prototype.checkTx = function(cb, txBytes) {
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
@@ -51,7 +51,7 @@ CounterApp.prototype.check_tx = function(cb, txBytes) {
 	return cb(tmsp.RetCodeOK, "", "");
 }
 
-CounterApp.prototype.get_hash = function(cb) {
+CounterApp.prototype.getHash = function(cb) {
 	this.hashCount += 1;
 	if (this.txCount == 0){
     return cb("", "Zero tx count; hash is empth");
