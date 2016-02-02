@@ -28,9 +28,9 @@ Connection.prototype.appendData = function(bytes) {
     return;
   }
   var r = new wire.Reader(this.recvBuf);
-  var msg;
+  var msgBytes;
   try {
-    msg = r.readByteArray();
+    msgBytes = r.readByteArray();
   } catch(e) {
     return;
   }
@@ -38,7 +38,7 @@ Connection.prototype.appendData = function(bytes) {
   this.waitingResult = true;
   this.socket.pause();
   try {
-    this.msgCb(msg, function() {
+    this.msgCb(msgBytes, function() {
       // This gets called after msg handler is finished with response.
       conn.waitingResult = false;
       conn.socket.resume();
@@ -54,7 +54,8 @@ Connection.prototype.appendData = function(bytes) {
   }
 };
 
-Connection.prototype.writeMessage = function(msgBytes) {
+Connection.prototype.writeMessage = function(msg) {
+  var msgBytes = msg.encode().toBuffer();
   var msgLength = wire.uvarintSize(msgBytes.length);
   var buf = new Buffer(1+msgLength+msgBytes.length);
   var w = new wire.Writer(buf);

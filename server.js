@@ -1,7 +1,6 @@
 var net = require("net");
-var wire = require("js-wire");
-var msg = require("./msgs");
-var types = require("./types");
+var proto = require("protobufjs");
+var types = proto.loadProtoFile("./types.proto");
 var Connection = require("./connection").Connection;
 
 // Takes an application and handles TMSP connection
@@ -24,42 +23,43 @@ Server.prototype.createServer = function() {
     socket.name = socket.remoteAddress + ":" + socket.remotePort;
     console.log("new connection from", socket.name);
 
-    var conn = new Connection(socket, function(msgBytes, cb) {
-      var r = new wire.Reader(msgBytes);
-
-      // Now we can decode
-      var typeByte = r.readByte();
-      var reqType = msg.types[typeByte];
+    var conn = new Connection(socket, function(reqBytes, cb) {
+      var req = types.Request.decode(reqBytes);
+      var msgType = req.type;
 
       // Special messages.
       // NOTE: msgs are length prefixed
-      if (reqType == "flush") {
-        var w = new wire.Writer();
-        w.writeByte(types.ResponseTypeFlush);
-        conn.writeMessage(w.getBuffer());
+      if (msgType == types.MessageType.Flush) {
+        var res = new types.Response({
+          type: msgType,
+        });
+        conn.writeMessage(res);
         conn.flush();
         return cb();
-      } else if (reqType == "echo") {
-        var message = r.readString();
-        var w = new wire.Writer();
-        w.writeByte(types.ResponseTypeEcho);
-        w.writeString(message);
-        conn.writeMessage(w.getBuffer());
+      } else if (req.type == types.MessageType.Echo) {
+        var res = new types.Response({
+          type: msgType,
+          data: req.data,
+        });
+        conn.writeMessage(res);
         return cb();
       }
 
-      // Make callback by wrapping cp
-      var resCb = msg.writerGenerators[reqType](new wire.Writer(), function(w) {
-        conn.writeMessage(w.getBuffer());
-        return cb();
+      // Make callback for apps to pass result.
+      var resCb = respondOnce(function(resObj) {
+        // Convert strings to utf8
+        if (typeof resObj.data == "string") {
+          resObj.data = new Buffer(resObj.data);
+        }
+        // Response type is always the same as req type
+        resObj.type = msgType;
+        var res = new types.Response(resObj);
+        conn.writeMessage(res);
+        cb(); // Tells Connection that we're done responding.
       });
 
-      // Decode arguments
-      var args = msg.readers[reqType](r);
-      args.unshift(resCb);
-
-      // Call function
-      var res = app[reqType].apply(app, args);
+      // Call app function
+      var res = app[reqType].call(app, req, resCb);
       if (res != undefined) {
         console.log("Message handler shouldn't return anything!");
       }
@@ -67,6 +67,21 @@ Server.prototype.createServer = function() {
     });
   });
 }
+
+// Wrap a function to only be called once.
+var respondOnce = function(f) {
+  var ran = false;
+  return function() {
+    if (ran) {
+      console.log("Error: response was already written");
+      console.log("arguments", arguments);
+      return
+    } else {
+      ran = true;
+    }
+    return f.apply(this, arguments);
+  };
+};
 
 module.exports = {
   Server: Server,

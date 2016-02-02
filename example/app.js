@@ -8,18 +8,26 @@ function CounterApp(){
   this.serial = false;
 };
 
-CounterApp.prototype.info = function(cb) {
-  return cb(util.format("hashes:%d, txs:%d", this.hashCount, this.txCount));
+CounterApp.prototype.info = function(req, cb) {
+  return cb({
+    data: util.format("hashes:%d, txs:%d", this.hashCount, this.txCount),
+  });
 }
 
-CounterApp.prototype.setOption = function(cb, key, value) {
-	if (key == "serial" && value == "on") {
-		this.serial = true;
+CounterApp.prototype.setOption = function(req, cb) {
+	if (req.key == "serial") {
+    if (req.value == "on") {
+      this.serial = true;
+      return cb({log:"ok"});
+    } else {
+      return cb({log:"Unexpected value "+req.value});
+    }
 	}
-  return cb("");
+  return cb({log: "Unexpected key "+req.key});
 }
 
-CounterApp.prototype.appendTx = function(cb, txBytes) {
+CounterApp.prototype.appendTx = function(req, cb) {
+  var txBytes = req.data;
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
@@ -28,11 +36,11 @@ CounterApp.prototype.appendTx = function(cb, txBytes) {
 		}	
     var txValue = txBytes.readIntBE(0, txBytes.length);
 		if (txValue != this.txCount){
-      return cb(tmsp.RetCodeInvalidNonce, "", "Nonce is invalid");
+      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is invalid"});
 		}
 	}
 	this.txCount += 1;
-	return cb(tmsp.RetCodeOK, "", "");
+	return cb({code:tmsp.CodeType_OK});
 }
 
 CounterApp.prototype.checkTx = function(cb, txBytes) {
@@ -44,25 +52,25 @@ CounterApp.prototype.checkTx = function(cb, txBytes) {
 		}	
     var txValue = txBytes.readIntBE(0, txBytes.length);
 		if (txValue < this.txCount){
-      return cb(tmsp.RetCodeInvalidNonce, "", "Nonce is too low");
+      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is too low"});
 		}
 	}
 	this.txCount += 1;
-	return cb(tmsp.RetCodeOK, "", "");
+	return cb({code:tmsp.CodeType_OK});
 }
 
 CounterApp.prototype.getHash = function(cb) {
 	this.hashCount += 1;
 	if (this.txCount == 0){
-    return cb("", "Zero tx count; hash is empth");
+    return cb({log:"Zero tx count; hash is empth"});
 	}
   var buf = new Buffer(8);
   buf.writeIntBE(this.txCount, 0, 8);
-  cb(buf, "");
+  return cb({result:buf});
 }
 
 CounterApp.prototype.query = function(cb) {
-  return cb("", "Query not yet supporrted");
+  return cb({code:tmsp.CodeType_OK, log:"Query not yet supported"});
 }
 
 console.log("Counter app in Javascript");

@@ -1,10 +1,10 @@
 {
   "name": "js-tmsp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Javascript TMSP libraries",
   "main": "index.js",
   "dependencies": {
+    "protobufjs": "~5.0.1",
     "js-wire": "0.0.2"
   }
 }
-
