@@ -1,8 +1,6 @@
 var net = require("net");
 var wire = require("js-wire");
-var proto = require("protobufjs");
-var builder = proto.loadProtoFile("./types.proto");
-var types = builder.build("types");
+var types = require("./types");
 var Connection = require("./connection").Connection;
 
 function Client(conn) {

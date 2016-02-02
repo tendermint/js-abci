@@ -1,6 +1,5 @@
 var net = require("net");
-var proto = require("protobufjs");
-var types = proto.loadProtoFile("./types.proto");
+var types = require("./types");
 var Connection = require("./connection").Connection;
 
 // Takes an application and handles TMSP connection
@@ -59,7 +58,11 @@ Server.prototype.createServer = function() {
       });
 
       // Call app function
-      var res = app[reqType].call(app, req, resCb);
+      var reqMethod = types.reqMethodLookup[msgType];
+      if (!reqMethod) {
+        throw "Unexpected request type "+reqType;
+      }
+      var res = app[reqMethod].call(app, req, resCb);
       if (res != undefined) {
         console.log("Message handler shouldn't return anything!");
       }

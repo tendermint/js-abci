@@ -27,49 +27,50 @@ CounterApp.prototype.setOption = function(req, cb) {
 }
 
 CounterApp.prototype.appendTx = function(req, cb) {
-  var txBytes = req.data;
+  var txBytes = req.data.toBuffer();
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
       var hexBytes = new Buffer(hexString, "hex");
       txBytes = hexBytes;
 		}	
-    var txValue = txBytes.readIntBE(0, txBytes.length);
+    var txValue = txBytes.readUIntBE(0, txBytes.length);
 		if (txValue != this.txCount){
-      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is invalid"});
+      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is invalid. Got "+txValue+", expected "+this.txCount});
 		}
 	}
 	this.txCount += 1;
 	return cb({code:tmsp.CodeType_OK});
 }
 
-CounterApp.prototype.checkTx = function(cb, txBytes) {
+CounterApp.prototype.checkTx = function(req, cb) {
+  var txBytes = req.data.toBuffer();
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
       var hexBytes = new Buffer(hexString, "hex");
       txBytes = hexBytes;
 		}	
-    var txValue = txBytes.readIntBE(0, txBytes.length);
+    var txValue = txBytes.readUIntBE(0, txBytes.length);
 		if (txValue < this.txCount){
-      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is too low"});
+      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is too low. Got "+txValue+", expected >= "+this.txCount});
 		}
 	}
 	this.txCount += 1;
 	return cb({code:tmsp.CodeType_OK});
 }
 
-CounterApp.prototype.getHash = function(cb) {
+CounterApp.prototype.getHash = function(req, cb) {
 	this.hashCount += 1;
 	if (this.txCount == 0){
     return cb({log:"Zero tx count; hash is empth"});
 	}
   var buf = new Buffer(8);
   buf.writeIntBE(this.txCount, 0, 8);
-  return cb({result:buf});
+  return cb({data:buf});
 }
 
-CounterApp.prototype.query = function(cb) {
+CounterApp.prototype.query = function(req, cb) {
   return cb({code:tmsp.CodeType_OK, log:"Query not yet supported"});
 }
 
