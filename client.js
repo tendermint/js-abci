@@ -130,6 +130,7 @@ Client.prototype.sendRequest = function() {
   // Get next request to send
   var nextReqRes = this.reqResQ[this.reqResQSendPtr];
   if (!nextReqRes) {
+    // NOTE: this case is duplicated at the end of this function
     this.sending = false;
     return // Nothing to send, we're done!
   }
@@ -147,6 +148,10 @@ Client.prototype.sendRequest = function() {
       ()=>{this.sendRequest()},
       0
     ); // TODO: benchmark this; batch it if slow.
+  } else {
+    // NOTE: this case is duplicated at the start of this function
+    this.sending = false;
+    return // Nothing to send, we're done!
   }
 }
 
