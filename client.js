@@ -1,5 +1,3 @@
-var net = require("net");
-var wire = require("js-wire");
 var types = require("./types");
 var Connection = require("./connection").Connection;
 
@@ -48,7 +46,7 @@ Client.prototype.info = function(cb) {
   this.writeReqObj(types.MessageType.Info, reqObj, cb);
 }
 
-Client.prototype.setOption = function(key, value) {
+Client.prototype.setOption = function(key, value, cb) {
   var reqObj = {key:key, value:value};
   this.writeReqObj(types.MessageType.SetOption, reqObj, cb);
 }

@@ -5,7 +5,8 @@ function xport(exports, m) {
 }
 
 var proto = require("protobufjs");
-var builder = proto.loadProtoFile("./types.proto");
+var protoPath = require("path").join(__dirname, "types.proto"); // TODO: better to just compile this into a js file.
+var builder = proto.loadProtoFile(protoPath);
 var types = builder.build("types");
 
 var reqMethodLookup = {};
