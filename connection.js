@@ -71,6 +71,10 @@ Connection.prototype.flush = function() {
   this.sendBuf = new Buffer(0);
 }
 
+Connection.prototype.close = function() {
+  this.socket.destroy();
+}
+
 module.exports = {
   Connection: Connection
 };

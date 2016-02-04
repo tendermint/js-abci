@@ -48,7 +48,7 @@ Client.prototype.onResponse = function(resBytes, cb) {
     return;
   }
   if (!!reqRes.cb) {
-    reqRes.cb.call(reqRes, res);
+    reqRes.cb(res);
   }
   // TODO: we'll want to do something more intelligent
   // in the future to handle reconnects; e.g. resend requests.
@@ -153,6 +153,10 @@ Client.prototype.sendRequest = function() {
     this.sending = false;
     return // Nothing to send, we're done!
   }
+}
+
+Client.prototype.close = function() {
+  this.conn.close();
 }
 
 module.exports = {
