@@ -88,9 +88,9 @@ Client.prototype.checkTx = function(txBytes, cb) {
   this.queueRequest(types.MessageType.CheckTx, reqObj, cb);
 }
 
-Client.prototype.getHash = function(cb) {
+Client.prototype.commit = function(cb) {
   var reqObj = {};
-  this.queueRequest(types.MessageType.GetHash, reqObj, cb);
+  this.queueRequest(types.MessageType.Commit, reqObj, cb);
 }
 
 Client.prototype.query = function(queryBytes, cb) {

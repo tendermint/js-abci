@@ -60,7 +60,7 @@ CounterApp.prototype.checkTx = function(req, cb) {
 	return cb({code:tmsp.CodeType_OK});
 }
 
-CounterApp.prototype.getHash = function(req, cb) {
+CounterApp.prototype.commit = function(req, cb) {
 	this.hashCount += 1;
 	if (this.txCount == 0){
     return cb({log:"Zero tx count; hash is empth"});

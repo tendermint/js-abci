@@ -14,7 +14,7 @@ reqMethodLookup[types.MessageType.Info]       = "info";
 reqMethodLookup[types.MessageType.SetOption]  = "setOption";
 reqMethodLookup[types.MessageType.AppendTx]   = "appendTx";
 reqMethodLookup[types.MessageType.CheckTx]    = "checkTx";
-reqMethodLookup[types.MessageType.GetHash]    = "getHash";
+reqMethodLookup[types.MessageType.Commit]     = "commit";
 reqMethodLookup[types.MessageType.Query]      = "query";
 
 module.exports = types;
