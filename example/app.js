@@ -36,7 +36,7 @@ CounterApp.prototype.appendTx = function(req, cb) {
 		}	
     var txValue = txBytes.readUIntBE(0, txBytes.length);
 		if (txValue != this.txCount){
-      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is invalid. Got "+txValue+", expected "+this.txCount});
+      return cb({code:tmsp.CodeType.BadNonce, log:"Nonce is invalid. Got "+txValue+", expected "+this.txCount});
 		}
 	}
 	this.txCount += 1;
@@ -53,7 +53,7 @@ CounterApp.prototype.checkTx = function(req, cb) {
 		}	
     var txValue = txBytes.readUIntBE(0, txBytes.length);
 		if (txValue < this.txCount){
-      return cb({code:tmsp.CodeType_InvalidNonce, log:"Nonce is too low. Got "+txValue+", expected >= "+this.txCount});
+      return cb({code:tmsp.CodeType.BadNonce, log:"Nonce is too low. Got "+txValue+", expected >= "+this.txCount});
 		}
 	}
 	this.txCount += 1;
