@@ -55,7 +55,6 @@ CounterApp.prototype.checkTx = function(req, cb) {
       return cb({code:tmsp.CodeType.BadNonce, log:"Nonce is too low. Got "+txValue+", expected >= "+this.txCount});
 		}
 	}
-	this.txCount += 1;
 	return cb({code:tmsp.CodeType_OK});
 }
 
