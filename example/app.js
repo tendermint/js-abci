@@ -1,4 +1,3 @@
-var wire = require("js-wire");
 var tmsp = require("js-tmsp");
 var util = require("util");
 
