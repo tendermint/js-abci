@@ -62,11 +62,14 @@ Server.prototype.createServer = function() {
       if (!reqMethod) {
         throw "Unexpected request type "+reqType;
       }
-      var res = app[reqMethod].call(app, req, resCb);
-      if (res != undefined) {
-        console.log("Message handler shouldn't return anything!");
+      if (!app[reqMethod]) {
+        resCb({code:tmsp.CodeType_OK, log:"Method not implemented: "+reqMethod});
+      } else {
+        var res = app[reqMethod].call(app, req, resCb);
+        if (res != undefined) {
+          console.log("Message handler shouldn't return anything!");
+        }
       }
-
     });
   });
 }

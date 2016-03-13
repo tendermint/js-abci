@@ -16,6 +16,8 @@ reqMethodLookup[types.MessageType.AppendTx]   = "appendTx";
 reqMethodLookup[types.MessageType.CheckTx]    = "checkTx";
 reqMethodLookup[types.MessageType.Commit]     = "commit";
 reqMethodLookup[types.MessageType.Query]      = "query";
+reqMethodLookup[types.MessageType.InitChain]  = "initChain";
+reqMethodLookup[types.MessageType.EndBlock]   = "endBlock";
 
 module.exports = types;
 module.exports.reqMethodLookup = reqMethodLookup;
