@@ -60,10 +60,10 @@ Server.prototype.createServer = function() {
       // Call app function
       var reqMethod = types.reqMethodLookup[msgType];
       if (!reqMethod) {
-        throw "Unexpected request type "+reqType;
+        throw "Unexpected request type "+reqMethod;
       }
       if (!app[reqMethod]) {
-        resCb({code:tmsp.CodeType_OK, log:"Method not implemented: "+reqMethod});
+        resCb({code:types.CodeType_OK, log:"Method not implemented: "+reqMethod});
       } else {
         var res = app[reqMethod].call(app, req, resCb);
         if (res != undefined) {
