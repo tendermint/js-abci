@@ -4,7 +4,7 @@ var Connection = require("./connection").Connection;
 
 // "tcp://127.0.0.1:46658" -> {host,port}
 // "unix://path" -> {path}
-function parseAddr(addr) {
+function ParseAddr(addr) {
   if (addr.startsWith("tcp://")) {
     var hostPort = addr.substr(6).split(":");
     return {host: hostPort[0], port: hostPort[1]};
@@ -25,7 +25,7 @@ function Client(addr) {
 }
 
 Client.prototype._connect = function() {
-  var addrObj = parseAddr(this.addr);
+  var addrObj = ParseAddr(this.addr);
   var socket = net.connect(addrObj, () => {
     this.conn = new Connection(socket, (resBytes, cb) => { this.onResponse(resBytes, cb); });
     this.wakeSender();
@@ -161,4 +161,5 @@ Client.prototype.close = function() {
 
 module.exports = {
   Client: Client,
+  ParseAddr: ParseAddr,
 };
