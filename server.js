@@ -24,21 +24,20 @@ Server.prototype.createServer = function() {
 
     var conn = new Connection(socket, function(reqBytes, cb) {
       var req = types.Request.decode(reqBytes);
-      var msgType = req.type;
+      var msgType = req.value;
 
       // Special messages.
       // NOTE: msgs are length prefixed
-      if (msgType == types.MessageType.Flush) {
+      if (msgType == "flush") {
         var res = new types.Response({
-          type: msgType,
+          flush: new types.ResponseFlush(),
         });
         conn.writeMessage(res);
         conn.flush();
         return cb();
-      } else if (req.type == types.MessageType.Echo) {
+      } else if (msgType == "echo") {
         var res = new types.Response({
-          type: msgType,
-          data: req.data,
+          echo: new types.ResponseEcho({message: req.data})
         });
         conn.writeMessage(res);
         return cb();
@@ -51,8 +50,10 @@ Server.prototype.createServer = function() {
           resObj.data = new Buffer(resObj.data);
         }
         // Response type is always the same as req type
-        resObj.type = msgType;
-        var res = new types.Response(resObj);
+        resMessageType = types.resMessageLookup[msgType];
+        var res = new types.Response();
+        var resValue = new resMessageType(resObj);
+        res.set(msgType, resValue);
         conn.writeMessage(res);
         cb(); // Tells Connection that we're done responding.
       });
@@ -60,10 +61,11 @@ Server.prototype.createServer = function() {
       // Call app function
       var reqMethod = types.reqMethodLookup[msgType];
       if (!reqMethod) {
-        throw "Unexpected request type "+reqMethod;
+        throw "Unexpected request type "+msgType;
       }
       if (!app[reqMethod]) {
-        resCb({code:types.CodeType_OK, log:"Method not implemented: "+reqMethod});
+        console.log("Method not implemented: "+reqMethod);
+        resCb({});
       } else {
         var res = app[reqMethod].call(app, req, resCb);
         if (res != undefined) {

@@ -1,6 +1,6 @@
 {
   "name": "js-tmsp",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Javascript TMSP libraries",
   "main": "index.js",
   "dependencies": {
