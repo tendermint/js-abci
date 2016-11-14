@@ -26,7 +26,7 @@ CounterApp.prototype.setOption = function(req, cb) {
 }
 
 CounterApp.prototype.appendTx = function(req, cb) {
-  var txBytes = req.data.toBuffer();
+  var txBytes = req.append_tx.tx.buffer;
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
@@ -43,7 +43,7 @@ CounterApp.prototype.appendTx = function(req, cb) {
 }
 
 CounterApp.prototype.checkTx = function(req, cb) {
-  var txBytes = req.data.toBuffer();
+  var txBytes = req.check_tx.tx.buffer;
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
