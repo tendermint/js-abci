@@ -67,6 +67,7 @@ Server.prototype.createServer = function() {
         console.log("Method not implemented: "+reqMethod);
         resCb({});
       } else {
+        var reqValue = req[msgType];
         var res = app[reqMethod].call(app, req, resCb);
         if (res != undefined) {
           console.log("Message handler shouldn't return anything!");

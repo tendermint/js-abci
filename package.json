@@ -1,6 +1,6 @@
 {
   "name": "js-abci",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Javascript ABCI libraries",
   "main": "index.js",
   "dependencies": {

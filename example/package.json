@@ -4,6 +4,6 @@
   "description": "Javascript ABCI example application",
   "main": "app.js",
   "dependencies": {
-    "js-abci": "0.0.9"
+    "js-abci": "0.1.1"
   }
 }
