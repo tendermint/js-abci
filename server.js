@@ -2,7 +2,7 @@ var net = require("net");
 var types = require("./types");
 var Connection = require("./connection").Connection;
 
-// Takes an application and handles TMSP connection
+// Takes an application and handles ABCI connection
 // which invoke methods on the app
 function Server(app) {
   // set the app for the socket handler
@@ -37,7 +37,7 @@ Server.prototype.createServer = function() {
         return cb();
       } else if (msgType == "echo") {
         var res = new types.Response({
-          echo: new types.ResponseEcho({message: req.data})
+          echo: new types.ResponseEcho({message: req.message})
         });
         conn.writeMessage(res);
         return cb();

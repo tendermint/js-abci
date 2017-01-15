@@ -1,7 +1,7 @@
 {
-  "name": "js-tmsp",
-  "version": "0.0.13",
-  "description": "Javascript TMSP libraries",
+  "name": "js-abci",
+  "version": "0.1.0",
+  "description": "Javascript ABCI libraries",
   "main": "index.js",
   "dependencies": {
     "protobufjs": "~5.0.1",

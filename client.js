@@ -34,7 +34,7 @@ Client.prototype._connect = function() {
 
 Client.prototype.onResponse = function(resBytes, cb) {
   var res = types.Response.decode(resBytes);
-  if (res.type === types.MessageCode_Exception) {
+  if (res.value === "exception") {
     this.setError(res[0]);
     return;
   }
@@ -43,7 +43,7 @@ Client.prototype.onResponse = function(resBytes, cb) {
     return;
   }
   var reqRes = this.reqResQ[0];
-  if (res.type !== reqRes.req.type) {
+  if (res.value !== reqRes.req.value) {
     this.setError("Unexpected response type: "+resBytes.toString("hex"));
     return;
   }
@@ -65,49 +65,63 @@ Client.prototype.setError = function(error) {
 
 Client.prototype.flush = function(cb) {
   var reqObj = {};
-  this.queueRequest(types.MessageType.Flush, reqObj, cb);
+  this.queueRequest("flush", reqObj, cb);
 }
 
 Client.prototype.info = function(cb) {
   var reqObj = {};
-  this.queueRequest(types.MessageType.Info, reqObj, cb);
+  this.queueRequest("info", reqObj, cb);
 }
 
 Client.prototype.setOption = function(key, value, cb) {
   var reqObj = {key:key, value:value};
-  this.queueRequest(types.MessageType.SetOption, reqObj, cb);
+  this.queueRequest("set_option", reqObj, cb);
 }
 
-Client.prototype.appendTx = function(txBytes, cb) {
-  var reqObj = {data:txBytes};
-  this.queueRequest(types.MessageType.AppendTx, reqObj, cb);
+Client.prototype.deliverTx = function(txBytes, cb) {
+  var reqObj = {tx:txBytes};
+  this.queueRequest("deliver_tx", reqObj, cb);
 }
 
 Client.prototype.checkTx = function(txBytes, cb) {
-  var reqObj = {data:txBytes};
-  this.queueRequest(types.MessageType.CheckTx, reqObj, cb);
+  var reqObj = {tx:txBytes};
+  this.queueRequest("check_tx", reqObj, cb);
 }
 
 Client.prototype.commit = function(cb) {
   var reqObj = {};
-  this.queueRequest(types.MessageType.Commit, reqObj, cb);
+  this.queueRequest("commit", reqObj, cb);
 }
 
 Client.prototype.query = function(queryBytes, cb) {
-  var reqObj = {data:queryBytes};
-  this.queueRequest(types.MessageType.Query, reqObj, cb);
+  var reqObj = {query:queryBytes};
+  this.queueRequest("query", reqObj, cb);
+}
+
+Client.prototype.initChain = function(cb) {
+  var reqObj = {};
+  this.queueRequest("init_chain", reqObj, cb);
+}
+
+Client.prototype.beginBlock = function(cb) {
+  var reqObj = {};
+  this.queueRequest("begin_block", reqObj, cb);
+}
+
+Client.prototype.endBlock = function(cb) {
+  var reqObj = {};
+  this.queueRequest("end_block", reqObj, cb);
 }
 
 Client.prototype.queueRequest = function(type, reqObj, cb) {
   if (typeof type === "undefined") {
     throw "queueRequest cannot handle undefined types";
   }
-  if (typeof type === 0) {
-    throw "queueRequest cannot handle null messages";
-  }
-  reqObj.type = type; // TODO: maybe copy the object?
-  var req = new types.Request(reqObj);
+  var reqObjWrapper = {};
+  reqObjWrapper[type] = reqObj;
+  var req = new types.Request(reqObjWrapper);
   var reqRes = {req:req,cb:cb};
+  console.log("!!!", req)
   this.reqResQ.push(reqRes);
   this.wakeSender();
 }
@@ -139,7 +153,7 @@ Client.prototype.sendRequest = function() {
   this.conn.writeMessage(req);
   this.reqResQSendPtr++;
   // Also flush maybe
-  if (req.type == types.MessageType.Flush) {
+  if (req.value == "flush") {
     this.conn.flush();
   }
   // If we have more messages to send...

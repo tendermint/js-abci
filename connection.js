@@ -10,7 +10,7 @@ function Connection(socket, msgCb) {
   this.waitingResult = false;
   var conn = this;
 
-  // Handle TMSP requests.
+  // Handle ABCI requests.
   socket.on('data', function(data) {
     conn.appendData(data);
   });

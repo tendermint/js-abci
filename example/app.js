@@ -1,4 +1,4 @@
-var tmsp = require("js-tmsp");
+var abci = require("js-abci");
 var util = require("util");
 
 function CounterApp(){
@@ -25,8 +25,8 @@ CounterApp.prototype.setOption = function(req, cb) {
   return cb({log: "Unexpected key "+req.key});
 }
 
-CounterApp.prototype.appendTx = function(req, cb) {
-  var txBytes = req.data.toBuffer();
+CounterApp.prototype.deliverTx = function(req, cb) {
+  var txBytes = req.tx.toBuffer();
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
@@ -35,15 +35,15 @@ CounterApp.prototype.appendTx = function(req, cb) {
 		}	
     var txValue = txBytes.readUIntBE(0, txBytes.length);
 		if (txValue != this.txCount){
-      return cb({code:tmsp.CodeType.BadNonce, log:"Nonce is invalid. Got "+txValue+", expected "+this.txCount});
+      return cb({code:abci.CodeType.BadNonce, log:"Nonce is invalid. Got "+txValue+", expected "+this.txCount});
 		}
 	}
 	this.txCount += 1;
-	return cb({code:tmsp.CodeType_OK});
+	return cb({code:abci.CodeType_OK});
 }
 
 CounterApp.prototype.checkTx = function(req, cb) {
-  var txBytes = req.data.toBuffer();
+  var txBytes = req.tx.toBuffer();
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
@@ -52,10 +52,10 @@ CounterApp.prototype.checkTx = function(req, cb) {
 		}	
     var txValue = txBytes.readUIntBE(0, txBytes.length);
 		if (txValue < this.txCount){
-      return cb({code:tmsp.CodeType.BadNonce, log:"Nonce is too low. Got "+txValue+", expected >= "+this.txCount});
+      return cb({code:abci.CodeType.BadNonce, log:"Nonce is too low. Got "+txValue+", expected >= "+this.txCount});
 		}
 	}
-	return cb({code:tmsp.CodeType_OK});
+	return cb({code:abci.CodeType_OK});
 }
 
 CounterApp.prototype.commit = function(req, cb) {
@@ -69,11 +69,11 @@ CounterApp.prototype.commit = function(req, cb) {
 }
 
 CounterApp.prototype.query = function(req, cb) {
-  return cb({code:tmsp.CodeType_OK, log:"Query not yet supported"});
+  return cb({code:abci.CodeType_OK, log:"Query not yet supported"});
 }
 
 console.log("Counter app in Javascript");
 
 var app = new CounterApp();
-var appServer = new tmsp.Server(app);
+var appServer = new abci.Server(app);
 appServer.server.listen(46658);
