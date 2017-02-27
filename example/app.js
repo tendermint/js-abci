@@ -4,46 +4,50 @@ var util = require("util");
 function CounterApp(){
 	this.hashCount = 0;
 	this.txCount = 0;
-  this.serial = false;
+  this.serial = true;
 };
 
 CounterApp.prototype.info = function(req, cb) {
   return cb({
     data: util.format("hashes:%d, txs:%d", this.hashCount, this.txCount),
   });
+
 }
 
 CounterApp.prototype.setOption = function(req, cb) {
-	if (req.key == "serial") {
-    if (req.value == "on") {
+  if (req.set_option.key == "serial") {
+    if (req.set_option.value == "on") {
       this.serial = true;
       return cb({log:"ok"});
+    } else if (req.set_option.value == "off") {
+      this.serial = false;
+      return cb({log:"ok"});
     } else {
-      return cb({log:"Unexpected value "+req.value});
+      return cb({log:"Unexpected value "+req.set_option.value});
     }
-	}
-  return cb({log: "Unexpected key "+req.key});
+  }
+  return cb({log: "Unexpected key "+req.set_option.key});
 }
 
 CounterApp.prototype.deliverTx = function(req, cb) {
-  var txBytes = req.tx.toBuffer();
-	if (this.serial) {
-		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
+  var txBytes = req.deliver_tx.tx.toBuffer();
+  if (this.serial) {
+    if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);
       var hexBytes = new Buffer(hexString, "hex");
       txBytes = hexBytes;
-		}	
+    }	
     var txValue = txBytes.readUIntBE(0, txBytes.length);
-		if (txValue != this.txCount){
+    if (txValue != this.txCount){
       return cb({code:abci.CodeType.BadNonce, log:"Nonce is invalid. Got "+txValue+", expected "+this.txCount});
-		}
-	}
-	this.txCount += 1;
-	return cb({code:abci.CodeType_OK});
+    }
+  }
+  this.txCount += 1;
+  return cb({code:abci.CodeType_OK});
 }
 
 CounterApp.prototype.checkTx = function(req, cb) {
-  var txBytes = req.tx.toBuffer();
+  var txBytes = req.check_tx.tx.toBuffer();
 	if (this.serial) {
 		if (txBytes.length >= 2 && txBytes.slice(0, 2) == "0x") {
       var hexString = txBytes.toString("ascii", 2);

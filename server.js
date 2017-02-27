@@ -37,7 +37,7 @@ Server.prototype.createServer = function() {
         return cb();
       } else if (msgType == "echo") {
         var res = new types.Response({
-          echo: new types.ResponseEcho({message: req.message})
+          echo: new types.ResponseEcho({message: req.echo.message})
         });
         conn.writeMessage(res);
         return cb();
@@ -46,9 +46,9 @@ Server.prototype.createServer = function() {
       // Make callback for apps to pass result.
       var resCb = respondOnce(function(resObj) {
         // Convert strings to utf8
-        if (typeof resObj.data == "string") {
+        /*if (typeof resObj.data == "string") {
           resObj.data = new Buffer(resObj.data);
-        }
+        }*/
         // Response type is always the same as req type
         resMessageType = types.resMessageLookup[msgType];
         var res = new types.Response();
