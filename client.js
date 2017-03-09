@@ -93,8 +93,8 @@ Client.prototype.commit = function(cb) {
   this.queueRequest("commit", reqObj, cb);
 }
 
-Client.prototype.query = function(queryBytes, cb) {
-  var reqObj = {query:queryBytes};
+Client.prototype.query = function(data, path, height, prove, cb) {
+  var reqObj = {data:data, path:path, height:height, prove:prove};
   this.queueRequest("query", reqObj, cb);
 }
 
