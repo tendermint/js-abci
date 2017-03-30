@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Javascript ABCI example application",
   "main": "app.js",
+  "scripts": {
+      "start": "npm install && node app.js"
+  },
   "dependencies": {
     "js-abci": "../"
   }
