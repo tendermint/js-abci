@@ -80,4 +80,4 @@ console.log("Counter app in Javascript");
 
 var app = new CounterApp();
 var appServer = new abci.Server(app);
-appServer.server.listen(46658);
+appServer.server.listen(46657);
