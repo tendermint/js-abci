@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "protoc --js_out=import_style=commonjs,binary:src proto/abci.proto -I proto"
+    "build": "protoc --js_out=import_style=commonjs,binary:compiled proto/*.proto -I proto"
   },
   "keywords": [
     "abci",
