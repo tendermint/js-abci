@@ -1,5 +1,5 @@
 syntax = "proto3";
-package types;
+package abci;
 
 // For more information on gogo.proto, see:
 // https://github.com/gogo/protobuf/blob/master/extensions.md
@@ -259,4 +259,3 @@ service ABCIApplication {
   rpc BeginBlock(RequestBeginBlock) returns (ResponseBeginBlock);
   rpc EndBlock(RequestEndBlock) returns (ResponseEndBlock);
 }
-

@@ -4,8 +4,7 @@
   "description": "Tendermint ABCI client/server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "protoc --js_out=import_style=commonjs,binary:compiled proto/*.proto -I proto"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "abci",
@@ -16,6 +15,8 @@
   "author": "Matt Bell <mappum@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "google-protobuf": "^3.5.0"
+    "bl": "^1.2.2",
+    "old": "^0.2.0",
+    "protobufjs": "^6.8.6"
   }
 }
