@@ -1,0 +1,21 @@
+{
+  "name": "abci",
+  "version": "1.0.0",
+  "description": "Tendermint ABCI client/server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "protoc --js_out=import_style=commonjs,binary:src proto/abci.proto -I proto"
+  },
+  "keywords": [
+    "abci",
+    "tendermint",
+    "cosmos",
+    "blockchain"
+  ],
+  "author": "Matt Bell <mappum@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "google-protobuf": "^3.5.0"
+  }
+}
