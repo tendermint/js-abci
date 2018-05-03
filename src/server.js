@@ -1,38 +1,5 @@
 var net = require('net')
-var Connection = require('./connection').Connection
-var messages = require('./types_pb')
-var valueCase = messages.Response.ValueCase
-
-var reqMethodLookup = {
-  info: 'info',
-  setOption: 'setOption',
-  deliverTx: 'deliverTx',
-  checkTx: 'checkTx',
-  commit: 'commit',
-  query: 'query',
-  initChain: 'initChain',
-  beginBlock: 'beginBlock',
-  endBlock: 'endBlock'
-}
-
-var responseEnum = {
-  info: valueCase.INFO,
-  setOption: valueCase.SET_OPTION,
-  deliverTx: valueCase.DELIVER_TX,
-  checkTx: valueCase.CHECK_TX,
-  commit: valueCase.COMMIT,
-  query: valueCase.QUERY,
-  initChain: valueCase.INIT_CHAIN,
-  beginBlock: valueCase.BEGIN_BLOCK,
-  endBlock: valueCase.END_BLOCK,
-  flush: valueCase.FLUSH,
-  echo: valueCase.ECHO,
-  exception: valueCase.EXCEPTION
-}
-
-var fieldsEnum = {
-  lastBlockAppHash: 3,
-}
+var Connection = require('./connection')
 
 // Takes an application and handles ABCI connection
 // which invoke methods on the app
@@ -57,40 +24,28 @@ Server.prototype.createServer = function() {
 
     var conn = new Connection(socket, async function(req, cb) {
       // var req = types.decodeRequest(reqBytes)
-      let msgType
-      for (let _msgType in req) {
-        if (req[_msgType] !== undefined) {
-          msgType = _msgType
-          break
-        }
-      }
+      console.log('req', req)
+
+      let res = {exception: {error: 'test error 123'}}
+      conn.write(res)
+      return cb()
 
       var encodeMsg = function(emsg) {
-        var data = {}
-
-        for (var i in emsg[msgType]) {
-          data[fieldsEnum[i]] = emsg[msgType][i]
-        }
-
-        if (data === {}) {
-          data = emsg[msgType]
-        }
-
-        var encMsg = { [responseEnum[msgType] - 1]: data }
-        var resBytes = new messages.Response(encMsg)
-        return resBytes.serializeBinary()
+        console.log(messages.Response.from(emsg))
+        return messages.Response.from(emsg)
       }
 
-      // Special messages.
-      // NOTE: msgs are length prefixed
-      if (msgType == 'flush') {
-        conn.writeMessage(encodeMsg({ flush: {} }))
-        conn.flush()
-        return cb()
-      } else if (msgType == 'echo') {
-        conn.writeMessage(encodeMsg({ echo: { message: req.echo.message} }))
-        return cb()
-      }
+      // // Special messages.
+      // // NOTE: msgs are length prefixed
+      // if (msgType == 'flush') {
+      //   conn.writeMessage(encodeMsg({ flush: {} }))
+      //   conn.flush()
+      //   return cb()
+      // } else if (msgType == 'echo') {
+      //   conn.writeMessage(encodeMsg({ echo: { message: req.echo.message} }))
+      //   return cb()
+      // } else {
+      // }
 
       // Make callback for apps to pass result.
       var resCb = respondOnce(function(resObj) {
@@ -116,7 +71,6 @@ Server.prototype.createServer = function() {
         resCb({})
       } else {
         var reqValue = req[msgType]
-        var res;
         if (reqMethod === 'checkTx' || reqMethod === 'deliverTx') {
           res = await app[reqMethod].call(app, req, resCb)
         } else {

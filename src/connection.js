@@ -1,89 +1,82 @@
-var encodings = require('protocol-buffers-encodings')
-var varint = encodings.varint
-var int64 = encodings.int64
-var messages = require('./types_pb')
+let EventEmitter = require('events')
+let BufferList = require('bl')
+let old = require('old')
+let { varint } = require('protocol-buffers-encodings')
+let getTypes = require('./types.js')
 
-var maxWriteBufferLength = 4096 // Any more and flush
+// asynchronously load types from proto files
+let Request, Response
+getTypes().then((types) => {
+  Request = types.lookupType('abci.Request')
+  Response = types.lookupType('abci.Response')
+})
 
-function Connection(socket, msgCb) {
-  this.socket = socket
-  this.recvBuf = new Buffer(0)
-  this.sendBuf = new Buffer(0)
-  this.msgCb = msgCb
-  this.waitingResult = false
-  var conn = this
+const MAX_LENGTH = 4096
 
-  // Handle ABCI requests.
-  socket.on('data', function(data) {
-    conn.appendData(data)
-  })
-}
+class Connection extends EventEmitter {
+  constructor (stream, onMessage) {
+    if (!Request) {
+      throw Error('Tried to create a connection before loading protobuf files')
+    }
 
-Connection.prototype.appendData = function(bytes) {
-  var conn = this
-  if (bytes.length > 0) {
-    this.recvBuf = Buffer.concat([this.recvBuf, new Buffer(bytes)])
-  }
-  if (this.waitingResult) {
-    return
-  }
+    super()
 
-  var msg = null;
-  var msgLength = varint.decode(this.recvBuf)
-  var skipBytes = varint.decode.bytes
+    this.stream = stream
+    this.onMessage = onMessage
+    this.recvBuf = new BufferList()
+    this.waiting = false
 
-  var r = this.recvBuf.slice(skipBytes, this.recvBuf.length)
-  this.recvBuf = r;
-
-  //TODO: check if length > 4096
-  var r = this.recvBuf.slice(0, msgLength)
-
-  try {
-    var request = messages.Request.deserializeBinary(new Uint8Array(r))
-    msg = request.toObject()
-  } catch (e) {
-    console.log(e)
-    return
+    stream.on('data', this.onData.bind(this))
   }
 
-  this.recvBuf = this.recvBuf.slice(msgLength, this.recvBuf.length)
-  this.waitingResult = true
-  this.socket.pause()
-  try {
-    this.msgCb(msg, function() {
-      // This gets called after msg handler is finished with response.
-      conn.waitingResult = false
-      conn.socket.resume()
-      if (conn.recvBuf.length > 0) {
-        conn.appendData('')
+  onData (data) {
+    console.log(data)
+    this.recvBuf.append(data)
+    if (this.waiting) return
+    this.handleErrors(this.readNextMessage())
+  }
+
+  handleErrors (promise) {
+    promise.catch((err) => this.emit('error', err))
+  }
+
+  async readNextMessage () {
+    let length = varint.decode(this.recvBuf.slice(0, 4)) >> 1
+    if (length > MAX_LENGTH) {
+      throw Error('Message length greater than maximum')
+    }
+
+    let messageBytes = this.recvBuf.slice(
+      varint.decode.bytes, varint.decode.bytes + length)
+    this.recvBuf.consume(varint.decode.bytes + length)
+
+    let message = Request.decode(messageBytes)
+
+    this.waiting = true
+    this.stream.pause()
+
+    this.onMessage(message, () => {
+      this.waiting = false
+      this.stream.resume()
+
+      if (this.recvBuf.length > 0) {
+        this.handleErrors(this.readNextMessage())
       }
     })
-  } catch (e) {
-    if (e.stack) {
-      console.log('FATAL ERROR STACK: ', e.stack)
-    }
-    console.log('FATAL ERROR: ', e)
+  }
+
+  write (message) {
+    this.handleErrors(this._write(message))
+  }
+
+  async _write (message) {
+    let messageBytes = Response.encodeDelimited(message).finish()
+    this.stream.write(messageBytes)
+  }
+
+  close () {
+    this.stream.destroy()
   }
 }
 
-Connection.prototype.writeMessage = function(msgBytes) {
-  var msgLength = new Buffer(varint.encode(msgBytes.length))
-  var buf = Buffer.concat([msgLength, msgBytes])
-  this.sendBuf = Buffer.concat([this.sendBuf, buf])
-  if (this.sendBuf.length >= maxWriteBufferLength) {
-    this.flush()
-  }
-}
-
-Connection.prototype.flush = function() {
-  var n = this.socket.write(this.sendBuf)
-  this.sendBuf = new Buffer(0)
-}
-
-Connection.prototype.close = function() {
-  this.socket.destroy()
-}
-
-module.exports = {
-  Connection: Connection
-}
+module.exports = old(Connection)
