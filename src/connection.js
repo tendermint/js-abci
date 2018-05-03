@@ -1,5 +1,6 @@
 let EventEmitter = require('events')
 let BufferList = require('bl')
+let debug = require('debug')('abci:connection')
 let old = require('old')
 let { varint } = require('protocol-buffers-encodings')
 let getTypes = require('./types.js')
@@ -14,7 +15,7 @@ getTypes().then((types) => {
 const MAX_LENGTH = 4096
 
 class Connection extends EventEmitter {
-  constructor (stream, onMessage) {
+  constructor (stream, onMessage, isServer) {
     if (!Request) {
       throw Error('Tried to create a connection before loading protobuf files')
     }
@@ -23,6 +24,7 @@ class Connection extends EventEmitter {
 
     this.stream = stream
     this.onMessage = onMessage
+    this.isServer = isServer
     this.recvBuf = new BufferList()
     this.waiting = false
 
@@ -30,7 +32,6 @@ class Connection extends EventEmitter {
   }
 
   onData (data) {
-    console.log(data)
     this.recvBuf.append(data)
     if (this.waiting) return
     this.handleErrors(this.readNextMessage())
@@ -50,10 +51,13 @@ class Connection extends EventEmitter {
       varint.decode.bytes, varint.decode.bytes + length)
     this.recvBuf.consume(varint.decode.bytes + length)
 
-    let message = Request.decode(messageBytes)
+    let type = this.isServer ? Request : Response
+    let message = type.decode(messageBytes)
 
     this.waiting = true
     this.stream.pause()
+
+    debug('<<', message)
 
     this.onMessage(message, () => {
       this.waiting = false
@@ -70,7 +74,13 @@ class Connection extends EventEmitter {
   }
 
   async _write (message) {
-    let messageBytes = Response.encodeDelimited(message).finish()
+    let type = this.isServer ? Response : Request
+    if (debug.enabled) {
+      debug('>>', type.fromObject(message))
+    }
+    let messageBytes = type.encode(message).finish()
+    let lengthBytes = varint.encode(messageBytes.length << 1)
+    this.stream.write(Buffer.from(lengthBytes))
     this.stream.write(messageBytes)
   }
 

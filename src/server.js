@@ -1,101 +1,60 @@
-var net = require('net')
-var Connection = require('./connection')
+let net = require('net')
+let debug = require('debug')('abci:server')
+let Connection = require('./connection.js')
 
-// Takes an application and handles ABCI connection
-// which invoke methods on the app
-function Server(app) {
-  // set the app for the socket handler
-  this.app = app
+function createServer (app) {
+  let server = net.createServer(function (client) {
+    client.name = `${client.remoteAddress}:${client.remotePort}`
 
-  // create a server by providing callback for
-  // accepting new connection and callbacks for
-  // connection events ('data', 'end', etc.)
-  this.createServer()
-}
+    let conn = new Connection(client, function (req, cb) {
+      let [ type ] = Object.keys(req)
+      let message = req[type]
 
-Server.prototype.createServer = function() {
-  var app = this.app
-
-  // Define the socket handler
-  this.server = net.createServer(async function(socket) {
-    //let types = await getTypes()
-    //let { resMessageLookup, reqMethodLookup } = types
-    socket.name = socket.remoteAddress + ':' + socket.remotePort
-
-    var conn = new Connection(socket, async function(req, cb) {
-      // var req = types.decodeRequest(reqBytes)
-      console.log('req', req)
-
-      let res = {exception: {error: 'test error 123'}}
-      conn.write(res)
-      return cb()
-
-      var encodeMsg = function(emsg) {
-        console.log(messages.Response.from(emsg))
-        return messages.Response.from(emsg)
+      // special messages
+      if (type === 'flush') {
+        conn.write({ flush: {} })
+        return cb()
+      } else if (type === 'echo') {
+        conn.write({ echo: { message: message.message } })
+        return cb()
       }
 
-      // // Special messages.
-      // // NOTE: msgs are length prefixed
-      // if (msgType == 'flush') {
-      //   conn.writeMessage(encodeMsg({ flush: {} }))
-      //   conn.flush()
-      //   return cb()
-      // } else if (msgType == 'echo') {
-      //   conn.writeMessage(encodeMsg({ echo: { message: req.echo.message} }))
-      //   return cb()
-      // } else {
-      // }
-
-      // Make callback for apps to pass result.
-      var resCb = respondOnce(function(resObj) {
-        // Convert strings to utf8
-        /*if (typeof resObj.data == "string") {
-          resObj.data = new Buffer(resObj.data);
-        }*/
-        // Response type is always the same as req type
-        // TODO: Add all types
-        var resValue = { [msgType]: resObj }
-        //let resBytes = tproto.Response.encode(resValue)
-        conn.writeMessage(encodeMsg(resValue))
-        cb() // Tells Connection that we're done responding.
+      let resCb = respondOnce((response) => {
+        let message = { [type]: response }
+        conn.write(message)
+        cb()
       })
 
-      // Call app function
-      var reqMethod = reqMethodLookup[msgType]
-      if (!reqMethod) {
-        throw 'Unexpected request type ' + msgType
+      // message handler not implemented in app
+      if (app[type] == null) {
+        return resCb({})
       }
-      if (!app[reqMethod]) {
-        console.log('Method not implemented: ' + reqMethod)
-        resCb({})
-      } else {
-        var reqValue = req[msgType]
-        if (reqMethod === 'checkTx' || reqMethod === 'deliverTx') {
-          res = await app[reqMethod].call(app, req, resCb)
-        } else {
-          res = app[reqMethod].call(app, req, resCb)
-        }
+
+      // call method
+      try {
+        app[type](message, resCb)
+      } catch (err) {
+        // if app throws an error, send an 'exception' response
+        debug(`ABCI error on "${type}":`, err)
+        message = { exception: { message: err.message } }
+        conn.writeMessage(message)
+        conn.close()
       }
-    })
+    }, true)
   })
+
+  return server
 }
 
-// Wrap a function to only be called once.
-var respondOnce = function(f) {
+var respondOnce = function (f) {
   var ran = false
-  return function() {
+  return (...args) => {
     if (ran) {
-      console.log('Error: response was already written')
-      console.log('arguments', arguments)
-      return
-    } else {
-      ran = true
+      throw Error('ABCI response callback called more than once')
     }
-    return f.apply(this, arguments)
+    ran = true
+    return f(...args)
   }
 }
 
-module.exports = {
-  Server: Server
-}
+module.exports = createServer
