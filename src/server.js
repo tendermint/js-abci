@@ -1,5 +1,5 @@
 let net = require('net')
-let debug = require('debug')('abci:server')
+let debug = require('debug')('abci')
 let Connection = require('./connection.js')
 
 function createServer (app) {

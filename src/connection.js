@@ -1,6 +1,6 @@
 let EventEmitter = require('events')
 let BufferList = require('bl')
-let debug = require('debug')('abci:connection')
+let debug = require('debug')('abci')
 let { varint } = require('protocol-buffers-encodings')
 let getTypes = require('./types.js')
 
@@ -51,7 +51,10 @@ class Connection extends EventEmitter {
     this.waiting = true
     this.stream.pause()
 
-    debug('<<', message)
+    // log incoming messages, except for 'flush'
+    if (message.flush == null) {
+      debug('<<', message)
+    }
 
     this.onMessage(message, () => {
       this.waiting = false
@@ -68,7 +71,8 @@ class Connection extends EventEmitter {
   }
 
   async _write (message) {
-    if (debug.enabled) {
+    // log outgoing messages, except for 'flush'
+    if (debug.enabled && message.flush == null) {
       debug('>>', Response.fromObject(message))
     }
     let messageBytes = Response.encode(message).finish()
