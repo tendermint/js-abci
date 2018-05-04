@@ -3,10 +3,10 @@ let debug = require('debug')('abci:server')
 let Connection = require('./connection.js')
 
 function createServer (app) {
-  let server = net.createServer(function (client) {
+  let server = net.createServer((client) => {
     client.name = `${client.remoteAddress}:${client.remotePort}`
 
-    let conn = new Connection(client, function (req, cb) {
+    let conn = new Connection(client, (req, cb) => {
       let [ type ] = Object.keys(req)
       let message = req[type]
 
@@ -19,28 +19,33 @@ function createServer (app) {
         return cb()
       }
 
-      let resCb = respondOnce((response) => {
+      let resCb = respondOnce((err, response) => {
+        if (err) return fail(err)
         let message = { [type]: response }
         conn.write(message)
         cb()
       })
 
+      let fail = (err) => {
+        // if app throws an error, send an 'exception' response
+        debug(`ABCI error on "${type}":`, err)
+        message = { exception: { error: err.toString() } }
+        conn.write(message)
+        conn.close()
+      }
+
       // message handler not implemented in app
       if (app[type] == null) {
-        return resCb({})
+        return resCb(null, {})
       }
 
       // call method
       try {
         app[type](message, resCb)
       } catch (err) {
-        // if app throws an error, send an 'exception' response
-        debug(`ABCI error on "${type}":`, err)
-        message = { exception: { message: err.message } }
-        conn.writeMessage(message)
-        conn.close()
+        fail(err)
       }
-    }, true)
+    })
   })
 
   return server

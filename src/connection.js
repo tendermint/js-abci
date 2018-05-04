@@ -1,21 +1,18 @@
 let EventEmitter = require('events')
 let BufferList = require('bl')
 let debug = require('debug')('abci:connection')
-let old = require('old')
 let { varint } = require('protocol-buffers-encodings')
 let getTypes = require('./types.js')
 
 // asynchronously load types from proto files
 let Request, Response
-getTypes().then((types) => {
+let loaded = getTypes().then((types) => {
   Request = types.lookupType('abci.Request')
   Response = types.lookupType('abci.Response')
 })
 
-const MAX_LENGTH = 4096
-
 class Connection extends EventEmitter {
-  constructor (stream, onMessage, isServer) {
+  constructor (stream, onMessage) {
     if (!Request) {
       throw Error('Tried to create a connection before loading protobuf files')
     }
@@ -24,7 +21,6 @@ class Connection extends EventEmitter {
 
     this.stream = stream
     this.onMessage = onMessage
-    this.isServer = isServer
     this.recvBuf = new BufferList()
     this.waiting = false
 
@@ -43,16 +39,14 @@ class Connection extends EventEmitter {
 
   async readNextMessage () {
     let length = varint.decode(this.recvBuf.slice(0, 4)) >> 1
-    if (length > MAX_LENGTH) {
-      throw Error('Message length greater than maximum')
-    }
-
+    let lengthLength = varint.decode.bytes
     let messageBytes = this.recvBuf.slice(
-      varint.decode.bytes, varint.decode.bytes + length)
-    this.recvBuf.consume(varint.decode.bytes + length)
+      lengthLength,
+      lengthLength + length
+    )
+    this.recvBuf.consume(lengthLength + length)
 
-    let type = this.isServer ? Request : Response
-    let message = type.decode(messageBytes)
+    let message = Request.decode(messageBytes)
 
     this.waiting = true
     this.stream.pause()
@@ -74,11 +68,10 @@ class Connection extends EventEmitter {
   }
 
   async _write (message) {
-    let type = this.isServer ? Response : Request
     if (debug.enabled) {
-      debug('>>', type.fromObject(message))
+      debug('>>', Response.fromObject(message))
     }
-    let messageBytes = type.encode(message).finish()
+    let messageBytes = Response.encode(message).finish()
     let lengthBytes = varint.encode(messageBytes.length << 1)
     this.stream.write(Buffer.from(lengthBytes))
     this.stream.write(messageBytes)
@@ -89,4 +82,5 @@ class Connection extends EventEmitter {
   }
 }
 
-module.exports = old(Connection)
+module.exports = Connection
+module.exports.loaded = loaded
