@@ -1,10 +1,10 @@
 {
   "name": "abci",
   "version": "1.0.0",
-  "description": "Tendermint ABCI client/server",
+  "description": "Tendermint ABCI server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard src/*.js test/*.js && nyc ava test/connection.js test/server.js"
   },
   "keywords": [
     "abci",
@@ -17,8 +17,12 @@
   "dependencies": {
     "bl": "^1.2.2",
     "debug": "^3.1.0",
-    "old": "^0.2.0",
     "protobufjs": "^6.8.6",
     "protocol-buffers-encodings": "^1.1.0"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "nyc": "^11.7.1",
+    "standard": "^11.0.1"
   }
 }
