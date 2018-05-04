@@ -14,12 +14,12 @@ test('respond', async (t) => {
   await Connection.loaded
 
   let server = createServer({
-    info (message, cb) {
+    info (message) {
       t.deepEqual(
         message.toJSON(),
         fixtures.infoRequest.info
       )
-      cb(null, fixtures.infoResponse.info)
+      return fixtures.infoResponse.info
     }
   })
 
@@ -27,6 +27,33 @@ test('respond', async (t) => {
   server.emit('connection', stream)
 
   stream.emit('data', fixtures.infoRequestBytes)
+
+  await wait()
+  t.is(
+    stream.sent.toString('hex'),
+    fixtures.infoResponseHex
+  )
+})
+
+test('respond async', async (t) => {
+  await Connection.loaded
+
+  let server = createServer({
+    async info (message) {
+      t.deepEqual(
+        message.toJSON(),
+        fixtures.infoRequest.info
+      )
+      return fixtures.infoResponse.info
+    }
+  })
+
+  let stream = mockStream()
+  server.emit('connection', stream)
+
+  stream.emit('data', fixtures.infoRequestBytes)
+
+  await wait()
   t.is(
     stream.sent.toString('hex'),
     fixtures.infoResponseHex
@@ -69,26 +96,7 @@ test('respond with callback error', async (t) => {
   await Connection.loaded
 
   let server = createServer({
-    info (message, cb) {
-      cb(Error('test error'))
-    }
-  })
-
-  let stream = mockStream()
-  server.emit('connection', stream)
-
-  stream.emit('data', fixtures.multiRequestBytes)
-  t.is(
-    stream.sent.toString('hex'),
-    fixtures.exceptionResponseHex
-  )
-})
-
-test('respond with thrown error', async (t) => {
-  await Connection.loaded
-
-  let server = createServer({
-    info (message, cb) {
+    info (message) {
       throw Error('test error')
     }
   })
@@ -103,17 +111,12 @@ test('respond with thrown error', async (t) => {
   )
 })
 
-test('message callbacks can only be called once', async (t) => {
+test('respond with async callback error', async (t) => {
   await Connection.loaded
 
   let server = createServer({
-    info (message, cb) {
-      cb(null, {})
-      try {
-        cb(null, {})
-      } catch (err) {
-        t.is(err.message, 'ABCI response callback called more than once')
-      }
+    async info (message) {
+      throw Error('test error')
     }
   })
 
@@ -121,4 +124,14 @@ test('message callbacks can only be called once', async (t) => {
   server.emit('connection', stream)
 
   stream.emit('data', fixtures.multiRequestBytes)
+
+  await wait()
+  t.is(
+    stream.sent.toString('hex'),
+    fixtures.exceptionResponseHex
+  )
 })
+
+function wait () {
+  return new Promise(setImmediate)
+}

@@ -30,14 +30,10 @@ class Connection extends EventEmitter {
   onData (data) {
     this.recvBuf.append(data)
     if (this.waiting) return
-    this.handleErrors(this.readNextMessage())
+    this.readNextMessage()
   }
 
-  handleErrors (promise) {
-    promise.catch((err) => this.emit('error', err))
-  }
-
-  async readNextMessage () {
+  readNextMessage () {
     let length = varint.decode(this.recvBuf.slice(0, 4)) >> 1
     let lengthLength = varint.decode.bytes
     let messageBytes = this.recvBuf.slice(
@@ -52,7 +48,7 @@ class Connection extends EventEmitter {
     this.stream.pause()
 
     // log incoming messages, except for 'flush'
-    if (message.flush == null) {
+    if (!message.flush) {
       debug('<<', message)
     }
 
@@ -61,18 +57,18 @@ class Connection extends EventEmitter {
       this.stream.resume()
 
       if (this.recvBuf.length > 0) {
-        this.handleErrors(this.readNextMessage())
+        this.readNextMessage()
       }
     })
   }
 
   write (message) {
-    this.handleErrors(this._write(message))
+    this._write(message)
   }
 
-  async _write (message) {
+  _write (message) {
     // log outgoing messages, except for 'flush'
-    if (debug.enabled && message.flush == null) {
+    if (debug.enabled && !message.flush) {
       debug('>>', Response.fromObject(message))
     }
     let messageBytes = Response.encode(message).finish()
