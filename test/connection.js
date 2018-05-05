@@ -1,26 +1,15 @@
 let test = require('ava')
 let Connection = require('../src/connection.js')
 let fixtures = require('./fixtures.js')
-let { mockStream } = require('./common.js')
+let { mockStream, wait } = require('./common.js')
 
-test('create connection before loading protobuf', (t) => {
-  try {
-    let connection = new Connection()
-    t.fail(connection, 'should have thrown')
-  } catch (err) {
-    t.is(err.message, 'Tried to create a connection before loading protobuf files')
-  }
-})
-
-test('create connection after loading protobuf', async (t) => {
-  await Connection.loaded
+test('create connection', (t) => {
   let stream = mockStream()
   let connection = new Connection(stream)
   t.true(connection instanceof Connection, 'created connection')
 })
 
 test('receive requests', async (t) => {
-  await Connection.loaded
   let received = []
   let onMessage = (message, cb) => {
     received.push(message)
@@ -31,6 +20,7 @@ test('receive requests', async (t) => {
   t.true(connection instanceof Connection, 'created connection')
 
   stream.emit('data', fixtures.multiRequestBytes)
+  await wait()
 
   t.is(received.length, 2)
   t.deepEqual(received[0].toJSON(), fixtures.infoRequest)
@@ -38,8 +28,6 @@ test('receive requests', async (t) => {
 })
 
 test('requests not emitted while waiting for handler', async (t) => {
-  await Connection.loaded
-
   let numMessages = 0
   let onMessageCb
   let onMessage = (message, cb) => {
@@ -51,10 +39,12 @@ test('requests not emitted while waiting for handler', async (t) => {
   t.true(connection instanceof Connection, 'created connection')
 
   stream.emit('data', fixtures.multiRequestBytes)
+  await wait()
   t.is(numMessages, 1)
   onMessageCb()
   t.is(numMessages, 2)
   stream.emit('data', fixtures.multiRequestBytes)
+  await wait()
   t.is(numMessages, 2)
   onMessageCb()
   t.is(numMessages, 3)
@@ -63,21 +53,19 @@ test('requests not emitted while waiting for handler', async (t) => {
 })
 
 test('send responses', async (t) => {
-  await Connection.loaded
   let onMessage = (message, cb) => cb()
   let stream = mockStream()
   let connection = new Connection(stream, onMessage)
 
   connection.write(fixtures.infoResponse)
-
+  await wait()
   t.is(
     stream.sent.toString('hex'),
     fixtures.infoResponseHex
   )
 })
 
-test('close', async (t) => {
-  await Connection.loaded
+test('close', (t) => {
   let onMessage = (message, cb) => cb()
   let stream = mockStream()
 
@@ -87,4 +75,17 @@ test('close', async (t) => {
   let connection = new Connection(stream, onMessage)
   connection.close()
   t.true(destroyCalled)
+})
+
+test('write errors are emitted', async (t) => {
+  let onMessage = (message, cb) => cb()
+  let stream = mockStream()
+
+  let connection = new Connection(stream, onMessage)
+  connection.on('error', (err) => {
+    t.is(err.message, "Cannot read property 'exception' of undefined")
+  })
+  connection.write()
+
+  await wait()
 })

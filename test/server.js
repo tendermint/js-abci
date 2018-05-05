@@ -3,7 +3,7 @@ let test = require('ava')
 let Connection = require('../src/connection.js')
 let { createServer } = require('..')
 let fixtures = require('./fixtures.js')
-let { mockStream } = require('./common.js')
+let { mockStream, wait } = require('./common.js')
 
 test('create server', (t) => {
   let server = createServer({})
@@ -69,6 +69,7 @@ test('respond to non-implemented functions', async (t) => {
   server.emit('connection', stream)
 
   stream.emit('data', fixtures.infoRequestBytes)
+  await wait()
   t.is(
     stream.sent.toString('hex'),
     fixtures.emptyInfoResponseHex
@@ -85,6 +86,7 @@ test('respond to special functions', async (t) => {
 
   stream.emit('data', fixtures.flushRequestBytes)
   stream.emit('data', fixtures.echoRequestBytes)
+  await wait()
   t.is(
     stream.sent.toString('hex'),
     fixtures.flushResponseHex +
@@ -105,6 +107,7 @@ test('respond with callback error', async (t) => {
   server.emit('connection', stream)
 
   stream.emit('data', fixtures.multiRequestBytes)
+  await wait()
   t.is(
     stream.sent.toString('hex'),
     fixtures.exceptionResponseHex
@@ -131,7 +134,3 @@ test('respond with async callback error', async (t) => {
     fixtures.exceptionResponseHex
   )
 })
-
-function wait () {
-  return new Promise(setImmediate)
-}

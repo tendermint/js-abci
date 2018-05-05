@@ -13,10 +13,6 @@ let loaded = getTypes().then((types) => {
 
 class Connection extends EventEmitter {
   constructor (stream, onMessage) {
-    if (!Request) {
-      throw Error('Tried to create a connection before loading protobuf files')
-    }
-
     super()
 
     this.stream = stream
@@ -27,7 +23,8 @@ class Connection extends EventEmitter {
     stream.on('data', this.onData.bind(this))
   }
 
-  onData (data) {
+  async onData (data) {
+    await loaded
     this.recvBuf.append(data)
     if (this.waiting) return
     this.readNextMessage()
@@ -64,9 +61,11 @@ class Connection extends EventEmitter {
 
   write (message) {
     this._write(message)
+      .catch((err) => this.emit('error', err))
   }
 
-  _write (message) {
+  async _write (message) {
+    await loaded
     // log outgoing messages, except for 'flush'
     if (debug.enabled && !message.flush) {
       debug('>>', Response.fromObject(message))
