@@ -1,6 +1,6 @@
 # js-abci
 
-ABCI server for Node.js. Supports Tendermint v0.19.0+.
+ABCI server for Node.js. Supports up to Tendermint version 0.19.
 
 ## Usage
 
