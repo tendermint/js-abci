@@ -18,6 +18,11 @@ let handlers = {
   },
 
   checkTx (request) {
+    if(request.tx.length < 4) {
+      const zeroPadding = Buffer.alloc(4 - request.tx.length, 0);
+      request.tx = Buffer.concat([zeroPadding, request.tx]);
+    }
+    
     let number = request.tx.readUInt32BE(0)
     if (number !== state.count) {
       return { code: 1, log: 'tx does not match count' }
@@ -26,6 +31,11 @@ let handlers = {
   },
 
   deliverTx (request) {
+    if(request.tx.length < 4) {
+      const zeroPadding = Buffer.alloc(4 - request.tx.length, 0);
+      request.tx = Buffer.concat([zeroPadding, request.tx]);
+    }
+    
     let number = request.tx.readUInt32BE(0)
     if (number !== state.count) {
       return { code: 1, log: 'tx does not match count' }
