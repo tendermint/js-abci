@@ -18,7 +18,8 @@ let handlers = {
   },
 
   checkTx (request) {
-    let number = request.tx.readUInt32BE(0)
+    let tx = padTx(request.tx)
+    let number = tx.readUInt32BE(0)
     if (number !== state.count) {
       return { code: 1, log: 'tx does not match count' }
     }
@@ -26,7 +27,8 @@ let handlers = {
   },
 
   deliverTx (request) {
-    let number = request.tx.readUInt32BE(0)
+    let tx = padTx(request.tx)
+    let number = tx.readUInt32BE(0)
     if (number !== state.count) {
       return { code: 1, log: 'tx does not match count' }
     }
@@ -36,6 +38,13 @@ let handlers = {
 
     return { code: 0, log: 'tx succeeded' }
   }
+}
+
+// make sure the transaction data is 4 bytes long
+function padTx (tx) {
+  let buf = Buffer.alloc(4)
+  tx.copy(buf, 4 - tx.length)
+  return buf
 }
 
 let port = 46658
