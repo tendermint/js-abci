@@ -24,5 +24,17 @@
     "ava": "^0.25.0",
     "nyc": "^11.7.1",
     "standard": "^11.0.1"
-  }
+  },
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tendermint/js-abci.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tendermint/js-abci/issues"
+  },
+  "homepage": "https://github.com/tendermint/js-abci#readme"
 }
