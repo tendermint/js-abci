@@ -4,7 +4,7 @@
   "description": "Tendermint ABCI server",
   "main": "index.js",
   "scripts": {
-    "test": "standard src/*.js test/*.js && nyc ava test/connection.js test/server.js"
+    "test": "standard src/*.js test/*.js && nyc ava test/connection.js test/server.js test/integration.js"
   },
   "keywords": [
     "abci",
