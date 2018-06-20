@@ -22,8 +22,11 @@
   },
   "devDependencies": {
     "ava": "^0.25.0",
+    "get-port": "^3.2.0",
     "nyc": "^11.7.1",
-    "standard": "^11.0.1"
+    "standard": "^11.0.1",
+    "tempy": "^0.2.1",
+    "tendermint-node": "^3.0.0"
   },
   "directories": {
     "example": "example",
