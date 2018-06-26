@@ -19,7 +19,7 @@ let server = createServer({
 
   // implement any ABCI method handlers here
 })
-server.listen(46658)
+server.listen(26658)
 ```
 
 ### `let server = createServer(app)`

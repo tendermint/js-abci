@@ -47,7 +47,7 @@ function padTx (tx) {
   return buf
 }
 
-let port = 46658
+let port = 26658
 createABCIServer(handlers).listen(port, () => {
   console.log(`listening on port ${port}`)
 })
