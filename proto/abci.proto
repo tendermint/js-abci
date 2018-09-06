@@ -4,6 +4,7 @@ package abci;
 // For more information on gogo.proto, see:
 // https://github.com/gogo/protobuf/blob/master/extensions.md
 import "gogo.proto";
+import "timestamp.proto";
 import "tmlibs.proto";
 
 // This file is copied from http://github.com/tendermint/abci
