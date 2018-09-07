@@ -1,15 +1,9 @@
-let EventEmitter = require('events')
-let BufferList = require('bl')
-let debug = require('debug')('abci')
-let { varint } = require('protocol-buffers-encodings')
-let getTypes = require('./types.js')
+'use strict'
 
-// asynchronously load types from proto files
-let Request, Response
-let loaded = getTypes().then((types) => {
-  Request = types.lookupType('abci.Request')
-  Response = types.lookupType('abci.Response')
-})
+const EventEmitter = require('events')
+const BufferList = require('bl')
+const debug = require('debug')('abci')
+const { varint } = require('protocol-buffers-encodings')
 
 class Connection extends EventEmitter {
   constructor (stream, onMessage) {

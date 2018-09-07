@@ -1,6 +1,8 @@
-let net = require('net')
-let debug = require('debug')('abci')
-let Connection = require('./connection.js')
+'use strict'
+
+const net = require('net')
+const debug = require('debug')('abci')
+const Connection = require('./connection.js')
 
 function createServer (app) {
   let server = net.createServer((client) => {
