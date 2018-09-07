@@ -1,6 +1,6 @@
 {
   "name": "abci",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Tendermint ABCI server",
   "main": "index.js",
   "scripts": {
