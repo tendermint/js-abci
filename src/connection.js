@@ -4,6 +4,7 @@ const EventEmitter = require('events')
 const BufferList = require('bl')
 const debug = require('debug')('abci')
 const { varint } = require('protocol-buffers-encodings')
+const { Request, Response } = require('../types.js').abci
 
 class Connection extends EventEmitter {
   constructor (stream, onMessage) {
@@ -18,7 +19,6 @@ class Connection extends EventEmitter {
   }
 
   async onData (data) {
-    await loaded
     this.recvBuf.append(data)
     if (this.waiting) return
     this.readNextMessage()
@@ -59,7 +59,7 @@ class Connection extends EventEmitter {
   }
 
   async _write (message) {
-    await loaded
+    Response.verify(message)
     // log outgoing messages, except for 'flush'
     if (debug.enabled && !message.flush) {
       debug('>>', Response.fromObject(message))
@@ -76,4 +76,3 @@ class Connection extends EventEmitter {
 }
 
 module.exports = Connection
-module.exports.loaded = loaded
