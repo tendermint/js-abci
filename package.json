@@ -17,7 +17,7 @@
   "dependencies": {
     "bl": "^1.2.2",
     "debug": "^3.1.0",
-    "protobufjs": "^6.8.6",
+    "protobufjs": "^6.8.8",
     "protocol-buffers-encodings": "^1.1.0"
   },
   "devDependencies": {
@@ -26,7 +26,7 @@
     "nyc": "^11.7.1",
     "standard": "^11.0.1",
     "tempy": "^0.2.1",
-    "tendermint-node": "^3.0.0"
+    "tendermint-node": "^3.3.0"
   },
   "directories": {
     "example": "example",
