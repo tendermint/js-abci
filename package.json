@@ -27,7 +27,7 @@
     "nyc": "^11.7.1",
     "standard": "^11.0.1",
     "tempy": "^0.2.1",
-    "tendermint-node": "^3.3.0"
+    "tendermint-node": "^3.4.0"
   },
   "directories": {
     "example": "example",
