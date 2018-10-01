@@ -46,7 +46,7 @@ test('app info resolves over RPC', async (t) => {
   t.deepEqual(rpcResponse, { response: info })
 })
 
-test.only('large tx', async (t) => {
+test('large tx', async (t) => {
   let { ports, node } = t.context
 
   let server = createAbciServer({
@@ -78,6 +78,6 @@ test.only('large tx', async (t) => {
   let res = await node.rpc.broadcastTxCommit({
     tx: '0x' + Buffer.allocUnsafe(10e3).toString('hex')
   })
-
-  t.pass()
+  t.falsy(res.check_tx.code)
+  t.falsy(res.deliver_tx.code)
 })
