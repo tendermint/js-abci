@@ -21,12 +21,18 @@ class Connection extends EventEmitter {
   async onData (data) {
     this.recvBuf.append(data)
     if (this.waiting) return
-    this.readNextMessage()
+    this.maybeReadNextMessage()
   }
 
-  readNextMessage () {
-    let length = varint.decode(this.recvBuf.slice(0, 4)) >> 1
+  maybeReadNextMessage () {
+    let length = varint.decode(this.recvBuf.slice(0, 8)) >> 1
     let lengthLength = varint.decode.bytes
+
+    if (lengthLength + length > this.recvBuf.length) {
+      // buffering message, don't read yet
+      return
+    }
+
     let messageBytes = this.recvBuf.slice(
       lengthLength,
       lengthLength + length
@@ -48,7 +54,7 @@ class Connection extends EventEmitter {
       this.stream.resume()
 
       if (this.recvBuf.length > 0) {
-        this.readNextMessage()
+        this.maybeReadNextMessage()
       }
     })
   }
