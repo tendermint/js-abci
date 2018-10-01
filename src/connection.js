@@ -6,6 +6,8 @@ const debug = require('debug')('abci')
 const { varint } = require('protocol-buffers-encodings')
 const { Request, Response } = require('../types.js').abci
 
+const MAX_MESSAGE_SIZE = 104857600 // 100mb
+
 class Connection extends EventEmitter {
   constructor (stream, onMessage) {
     super()
@@ -16,6 +18,12 @@ class Connection extends EventEmitter {
     this.waiting = false
 
     stream.on('data', this.onData.bind(this))
+    stream.on('error', this.error.bind(this))
+  }
+
+  error (err) {
+    this.close()
+    this.emit('error', err)
   }
 
   async onData (data) {
@@ -27,6 +35,11 @@ class Connection extends EventEmitter {
   maybeReadNextMessage () {
     let length = varint.decode(this.recvBuf.slice(0, 8)) >> 1
     let lengthLength = varint.decode.bytes
+
+    if (length > MAX_MESSAGE_SIZE) {
+      this.error(Error('message is longer than maximum size'))
+      return
+    }
 
     if (lengthLength + length > this.recvBuf.length) {
       // buffering message, don't read yet
