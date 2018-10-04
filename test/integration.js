@@ -4,6 +4,14 @@ let getPort = require('get-port')
 let tm = require('tendermint-node')
 let createAbciServer = require('..')
 
+function startNode (home, ports) {
+  return tm.node(home, {
+    p2p: { laddr: `tcp://127.0.0.1:${ports.p2p}` },
+    rpc: { laddr: `tcp://127.0.0.1:${ports.rpc}` },
+    proxy_app: `tcp://127.0.0.1:${ports.abci}`
+  })
+}
+
 test.beforeEach(async (t) => {
   let home = createTempDir()
   await tm.init(home)
@@ -14,14 +22,12 @@ test.beforeEach(async (t) => {
     abci: await getPort()
   }
 
-  let node = tm.node(home, {
-    p2p: { laddr: `tcp://127.0.0.1:${ports.p2p}` },
-    rpc: { laddr: `tcp://127.0.0.1:${ports.rpc}` },
-    proxy_app: `tcp://127.0.0.1:${ports.abci}`
-  })
+  let node = startNode(home, ports)
 
-  t.context.ports = ports
-  t.context.node = node
+  Object.assign(
+    t.context,
+    { home, ports, node }
+  )
 })
 
 test.afterEach((t) => {
@@ -81,3 +87,61 @@ test('large tx', async (t) => {
   t.falsy(res.check_tx.code)
   t.falsy(res.deliver_tx.code)
 })
+
+test('reinitialization', async (t) => {
+  let { ports, node, home } = t.context
+
+  let lastBlockHeight, lastBlockAppHash
+  let hash = Buffer.alloc(32).fill(1)
+  let server = createAbciServer({
+    info: () => ({
+      lastBlockHeight,
+      lastBlockAppHash
+    }),
+
+    initChain (req) {
+      return {}
+    },
+
+    beginBlock (req) {
+      return {}
+    },
+
+    endBlock (req) {
+      return {}
+    },
+
+    commit (req) {
+      return {
+        data: hash
+      }
+    }
+  })
+  server.listen(ports.abci)
+
+  await node.started()
+  await node.synced()
+
+  // wait then get current height
+  await delay(3000)
+  let status = await node.rpc.status()
+
+  // kill node
+  await node.kill()
+
+  // start new node
+  lastBlockHeight = String(status.sync_info.latest_block_height)
+  lastBlockAppHash = hash
+  node = startNode(home, ports)
+  t.context.node = node
+  await node.started()
+  await node.synced()
+
+  await delay(2000)
+  status = await node.rpc.status()
+  t.true(Number(status.sync_info.latest_block_height) > 2)
+})
+
+function delay (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
