@@ -1,5 +1,5 @@
 {
-  "name": "abci",
+  "name": "js-abci",
   "version": "4.0.2",
   "description": "Tendermint ABCI server",
   "main": "index.js",
