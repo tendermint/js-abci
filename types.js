@@ -10897,18 +10897,6 @@ $root.abci = (function() {
     return abci;
 })();
 
-$root.gogoproto = (function() {
-
-    /**
-     * Namespace gogoproto.
-     * @exports gogoproto
-     * @namespace
-     */
-    var gogoproto = {};
-
-    return gogoproto;
-})();
-
 $root.google = (function() {
 
     /**
@@ -20474,6 +20462,18 @@ $root.google = (function() {
     })();
 
     return google;
+})();
+
+$root.gogoproto = (function() {
+
+    /**
+     * Namespace gogoproto.
+     * @exports gogoproto
+     * @namespace
+     */
+    var gogoproto = {};
+
+    return gogoproto;
 })();
 
 $root.common = (function() {
