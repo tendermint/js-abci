@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/js-abci
     docker:
-      - image: circleci/node:7.10.1
+      - image: circleci/node:10.9.0
     steps:
       - checkout
       - restore_cache:
