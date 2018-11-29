@@ -10,8 +10,11 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: NPM Install
-          command: npm install -g abci
+          name: NPM Install ABCI
+          command: npm install abci
+      - run:
+          name: NPM Install standard
+          command: npm install standard
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
