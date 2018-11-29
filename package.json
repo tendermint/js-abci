@@ -16,6 +16,7 @@
   "author": "Matt Bell <mappum@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "abci": "^4.0.2",
     "bl": "^1.2.2",
     "debug": "^3.1.0",
     "protobufjs": "^6.8.8",
