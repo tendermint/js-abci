@@ -923,6 +923,8 @@ $root.abci = (function() {
          * @memberof abci
          * @interface IRequestInfo
          * @property {string|null} [version] RequestInfo version
+         * @property {number|Long|null} [blockVersion] RequestInfo blockVersion
+         * @property {number|Long|null} [p2pVersion] RequestInfo p2pVersion
          */
 
         /**
@@ -947,6 +949,22 @@ $root.abci = (function() {
          * @instance
          */
         RequestInfo.prototype.version = "";
+
+        /**
+         * RequestInfo blockVersion.
+         * @member {number|Long} blockVersion
+         * @memberof abci.RequestInfo
+         * @instance
+         */
+        RequestInfo.prototype.blockVersion = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+        /**
+         * RequestInfo p2pVersion.
+         * @member {number|Long} p2pVersion
+         * @memberof abci.RequestInfo
+         * @instance
+         */
+        RequestInfo.prototype.p2pVersion = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
         /**
          * Creates a new RequestInfo instance using the specified properties.
@@ -974,6 +992,10 @@ $root.abci = (function() {
                 writer = $Writer.create();
             if (message.version != null && message.hasOwnProperty("version"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
+            if (message.blockVersion != null && message.hasOwnProperty("blockVersion"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.blockVersion);
+            if (message.p2pVersion != null && message.hasOwnProperty("p2pVersion"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint64(message.p2pVersion);
             return writer;
         };
 
@@ -1010,6 +1032,12 @@ $root.abci = (function() {
                 switch (tag >>> 3) {
                 case 1:
                     message.version = reader.string();
+                    break;
+                case 2:
+                    message.blockVersion = reader.uint64();
+                    break;
+                case 3:
+                    message.p2pVersion = reader.uint64();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1049,6 +1077,12 @@ $root.abci = (function() {
             if (message.version != null && message.hasOwnProperty("version"))
                 if (!$util.isString(message.version))
                     return "version: string expected";
+            if (message.blockVersion != null && message.hasOwnProperty("blockVersion"))
+                if (!$util.isInteger(message.blockVersion) && !(message.blockVersion && $util.isInteger(message.blockVersion.low) && $util.isInteger(message.blockVersion.high)))
+                    return "blockVersion: integer|Long expected";
+            if (message.p2pVersion != null && message.hasOwnProperty("p2pVersion"))
+                if (!$util.isInteger(message.p2pVersion) && !(message.p2pVersion && $util.isInteger(message.p2pVersion.low) && $util.isInteger(message.p2pVersion.high)))
+                    return "p2pVersion: integer|Long expected";
             return null;
         };
 
@@ -1066,6 +1100,24 @@ $root.abci = (function() {
             var message = new $root.abci.RequestInfo();
             if (object.version != null)
                 message.version = String(object.version);
+            if (object.blockVersion != null)
+                if ($util.Long)
+                    (message.blockVersion = $util.Long.fromValue(object.blockVersion)).unsigned = true;
+                else if (typeof object.blockVersion === "string")
+                    message.blockVersion = parseInt(object.blockVersion, 10);
+                else if (typeof object.blockVersion === "number")
+                    message.blockVersion = object.blockVersion;
+                else if (typeof object.blockVersion === "object")
+                    message.blockVersion = new $util.LongBits(object.blockVersion.low >>> 0, object.blockVersion.high >>> 0).toNumber(true);
+            if (object.p2pVersion != null)
+                if ($util.Long)
+                    (message.p2pVersion = $util.Long.fromValue(object.p2pVersion)).unsigned = true;
+                else if (typeof object.p2pVersion === "string")
+                    message.p2pVersion = parseInt(object.p2pVersion, 10);
+                else if (typeof object.p2pVersion === "number")
+                    message.p2pVersion = object.p2pVersion;
+                else if (typeof object.p2pVersion === "object")
+                    message.p2pVersion = new $util.LongBits(object.p2pVersion.low >>> 0, object.p2pVersion.high >>> 0).toNumber(true);
             return message;
         };
 
@@ -1082,10 +1134,31 @@ $root.abci = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.version = "";
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.blockVersion = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.blockVersion = options.longs === String ? "0" : 0;
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.p2pVersion = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.p2pVersion = options.longs === String ? "0" : 0;
+            }
             if (message.version != null && message.hasOwnProperty("version"))
                 object.version = message.version;
+            if (message.blockVersion != null && message.hasOwnProperty("blockVersion"))
+                if (typeof message.blockVersion === "number")
+                    object.blockVersion = options.longs === String ? String(message.blockVersion) : message.blockVersion;
+                else
+                    object.blockVersion = options.longs === String ? $util.Long.prototype.toString.call(message.blockVersion) : options.longs === Number ? new $util.LongBits(message.blockVersion.low >>> 0, message.blockVersion.high >>> 0).toNumber(true) : message.blockVersion;
+            if (message.p2pVersion != null && message.hasOwnProperty("p2pVersion"))
+                if (typeof message.p2pVersion === "number")
+                    object.p2pVersion = options.longs === String ? String(message.p2pVersion) : message.p2pVersion;
+                else
+                    object.p2pVersion = options.longs === String ? $util.Long.prototype.toString.call(message.p2pVersion) : options.longs === Number ? new $util.LongBits(message.p2pVersion.low >>> 0, message.p2pVersion.high >>> 0).toNumber(true) : message.p2pVersion;
             return object;
         };
 
@@ -4082,6 +4155,7 @@ $root.abci = (function() {
          * @interface IResponseInfo
          * @property {string|null} [data] ResponseInfo data
          * @property {string|null} [version] ResponseInfo version
+         * @property {number|Long|null} [appVersion] ResponseInfo appVersion
          * @property {number|Long|null} [lastBlockHeight] ResponseInfo lastBlockHeight
          * @property {Uint8Array|null} [lastBlockAppHash] ResponseInfo lastBlockAppHash
          */
@@ -4116,6 +4190,14 @@ $root.abci = (function() {
          * @instance
          */
         ResponseInfo.prototype.version = "";
+
+        /**
+         * ResponseInfo appVersion.
+         * @member {number|Long} appVersion
+         * @memberof abci.ResponseInfo
+         * @instance
+         */
+        ResponseInfo.prototype.appVersion = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
 
         /**
          * ResponseInfo lastBlockHeight.
@@ -4161,10 +4243,12 @@ $root.abci = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.data);
             if (message.version != null && message.hasOwnProperty("version"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
+            if (message.appVersion != null && message.hasOwnProperty("appVersion"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint64(message.appVersion);
             if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int64(message.lastBlockHeight);
+                writer.uint32(/* id 4, wireType 0 =*/32).int64(message.lastBlockHeight);
             if (message.lastBlockAppHash != null && message.hasOwnProperty("lastBlockAppHash"))
-                writer.uint32(/* id 4, wireType 2 =*/34).bytes(message.lastBlockAppHash);
+                writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.lastBlockAppHash);
             return writer;
         };
 
@@ -4206,9 +4290,12 @@ $root.abci = (function() {
                     message.version = reader.string();
                     break;
                 case 3:
-                    message.lastBlockHeight = reader.int64();
+                    message.appVersion = reader.uint64();
                     break;
                 case 4:
+                    message.lastBlockHeight = reader.int64();
+                    break;
+                case 5:
                     message.lastBlockAppHash = reader.bytes();
                     break;
                 default:
@@ -4252,6 +4339,9 @@ $root.abci = (function() {
             if (message.version != null && message.hasOwnProperty("version"))
                 if (!$util.isString(message.version))
                     return "version: string expected";
+            if (message.appVersion != null && message.hasOwnProperty("appVersion"))
+                if (!$util.isInteger(message.appVersion) && !(message.appVersion && $util.isInteger(message.appVersion.low) && $util.isInteger(message.appVersion.high)))
+                    return "appVersion: integer|Long expected";
             if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
                 if (!$util.isInteger(message.lastBlockHeight) && !(message.lastBlockHeight && $util.isInteger(message.lastBlockHeight.low) && $util.isInteger(message.lastBlockHeight.high)))
                     return "lastBlockHeight: integer|Long expected";
@@ -4277,6 +4367,15 @@ $root.abci = (function() {
                 message.data = String(object.data);
             if (object.version != null)
                 message.version = String(object.version);
+            if (object.appVersion != null)
+                if ($util.Long)
+                    (message.appVersion = $util.Long.fromValue(object.appVersion)).unsigned = true;
+                else if (typeof object.appVersion === "string")
+                    message.appVersion = parseInt(object.appVersion, 10);
+                else if (typeof object.appVersion === "number")
+                    message.appVersion = object.appVersion;
+                else if (typeof object.appVersion === "object")
+                    message.appVersion = new $util.LongBits(object.appVersion.low >>> 0, object.appVersion.high >>> 0).toNumber(true);
             if (object.lastBlockHeight != null)
                 if ($util.Long)
                     (message.lastBlockHeight = $util.Long.fromValue(object.lastBlockHeight)).unsigned = false;
@@ -4311,6 +4410,11 @@ $root.abci = (function() {
                 object.data = "";
                 object.version = "";
                 if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.appVersion = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.appVersion = options.longs === String ? "0" : 0;
+                if ($util.Long) {
                     var long = new $util.Long(0, 0, false);
                     object.lastBlockHeight = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
@@ -4327,6 +4431,11 @@ $root.abci = (function() {
                 object.data = message.data;
             if (message.version != null && message.hasOwnProperty("version"))
                 object.version = message.version;
+            if (message.appVersion != null && message.hasOwnProperty("appVersion"))
+                if (typeof message.appVersion === "number")
+                    object.appVersion = options.longs === String ? String(message.appVersion) : message.appVersion;
+                else
+                    object.appVersion = options.longs === String ? $util.Long.prototype.toString.call(message.appVersion) : options.longs === Number ? new $util.LongBits(message.appVersion.low >>> 0, message.appVersion.high >>> 0).toNumber(true) : message.appVersion;
             if (message.lastBlockHeight != null && message.hasOwnProperty("lastBlockHeight"))
                 if (typeof message.lastBlockHeight === "number")
                     object.lastBlockHeight = options.longs === String ? String(message.lastBlockHeight) : message.lastBlockHeight;
@@ -4831,8 +4940,9 @@ $root.abci = (function() {
          * @property {number|Long|null} [index] ResponseQuery index
          * @property {Uint8Array|null} [key] ResponseQuery key
          * @property {Uint8Array|null} [value] ResponseQuery value
-         * @property {Uint8Array|null} [proof] ResponseQuery proof
+         * @property {merkle.IProof|null} [proof] ResponseQuery proof
          * @property {number|Long|null} [height] ResponseQuery height
+         * @property {string|null} [codespace] ResponseQuery codespace
          */
 
         /**
@@ -4900,11 +5010,11 @@ $root.abci = (function() {
 
         /**
          * ResponseQuery proof.
-         * @member {Uint8Array} proof
+         * @member {merkle.IProof|null|undefined} proof
          * @memberof abci.ResponseQuery
          * @instance
          */
-        ResponseQuery.prototype.proof = $util.newBuffer([]);
+        ResponseQuery.prototype.proof = null;
 
         /**
          * ResponseQuery height.
@@ -4913,6 +5023,14 @@ $root.abci = (function() {
          * @instance
          */
         ResponseQuery.prototype.height = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * ResponseQuery codespace.
+         * @member {string} codespace
+         * @memberof abci.ResponseQuery
+         * @instance
+         */
+        ResponseQuery.prototype.codespace = "";
 
         /**
          * Creates a new ResponseQuery instance using the specified properties.
@@ -4951,9 +5069,11 @@ $root.abci = (function() {
             if (message.value != null && message.hasOwnProperty("value"))
                 writer.uint32(/* id 7, wireType 2 =*/58).bytes(message.value);
             if (message.proof != null && message.hasOwnProperty("proof"))
-                writer.uint32(/* id 8, wireType 2 =*/66).bytes(message.proof);
+                $root.merkle.Proof.encode(message.proof, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
             if (message.height != null && message.hasOwnProperty("height"))
                 writer.uint32(/* id 9, wireType 0 =*/72).int64(message.height);
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                writer.uint32(/* id 10, wireType 2 =*/82).string(message.codespace);
             return writer;
         };
 
@@ -5007,10 +5127,13 @@ $root.abci = (function() {
                     message.value = reader.bytes();
                     break;
                 case 8:
-                    message.proof = reader.bytes();
+                    message.proof = $root.merkle.Proof.decode(reader, reader.uint32());
                     break;
                 case 9:
                     message.height = reader.int64();
+                    break;
+                case 10:
+                    message.codespace = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -5065,12 +5188,17 @@ $root.abci = (function() {
             if (message.value != null && message.hasOwnProperty("value"))
                 if (!(message.value && typeof message.value.length === "number" || $util.isString(message.value)))
                     return "value: buffer expected";
-            if (message.proof != null && message.hasOwnProperty("proof"))
-                if (!(message.proof && typeof message.proof.length === "number" || $util.isString(message.proof)))
-                    return "proof: buffer expected";
+            if (message.proof != null && message.hasOwnProperty("proof")) {
+                var error = $root.merkle.Proof.verify(message.proof);
+                if (error)
+                    return "proof." + error;
+            }
             if (message.height != null && message.hasOwnProperty("height"))
                 if (!$util.isInteger(message.height) && !(message.height && $util.isInteger(message.height.low) && $util.isInteger(message.height.high)))
                     return "height: integer|Long expected";
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                if (!$util.isString(message.codespace))
+                    return "codespace: string expected";
             return null;
         };
 
@@ -5111,11 +5239,11 @@ $root.abci = (function() {
                     $util.base64.decode(object.value, message.value = $util.newBuffer($util.base64.length(object.value)), 0);
                 else if (object.value.length)
                     message.value = object.value;
-            if (object.proof != null)
-                if (typeof object.proof === "string")
-                    $util.base64.decode(object.proof, message.proof = $util.newBuffer($util.base64.length(object.proof)), 0);
-                else if (object.proof.length)
-                    message.proof = object.proof;
+            if (object.proof != null) {
+                if (typeof object.proof !== "object")
+                    throw TypeError(".abci.ResponseQuery.proof: object expected");
+                message.proof = $root.merkle.Proof.fromObject(object.proof);
+            }
             if (object.height != null)
                 if ($util.Long)
                     (message.height = $util.Long.fromValue(object.height)).unsigned = false;
@@ -5125,6 +5253,8 @@ $root.abci = (function() {
                     message.height = object.height;
                 else if (typeof object.height === "object")
                     message.height = new $util.LongBits(object.height.low >>> 0, object.height.high >>> 0).toNumber();
+            if (object.codespace != null)
+                message.codespace = String(object.codespace);
             return message;
         };
 
@@ -5164,18 +5294,13 @@ $root.abci = (function() {
                     if (options.bytes !== Array)
                         object.value = $util.newBuffer(object.value);
                 }
-                if (options.bytes === String)
-                    object.proof = "";
-                else {
-                    object.proof = [];
-                    if (options.bytes !== Array)
-                        object.proof = $util.newBuffer(object.proof);
-                }
+                object.proof = null;
                 if ($util.Long) {
                     var long = new $util.Long(0, 0, false);
                     object.height = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
                     object.height = options.longs === String ? "0" : 0;
+                object.codespace = "";
             }
             if (message.code != null && message.hasOwnProperty("code"))
                 object.code = message.code;
@@ -5193,12 +5318,14 @@ $root.abci = (function() {
             if (message.value != null && message.hasOwnProperty("value"))
                 object.value = options.bytes === String ? $util.base64.encode(message.value, 0, message.value.length) : options.bytes === Array ? Array.prototype.slice.call(message.value) : message.value;
             if (message.proof != null && message.hasOwnProperty("proof"))
-                object.proof = options.bytes === String ? $util.base64.encode(message.proof, 0, message.proof.length) : options.bytes === Array ? Array.prototype.slice.call(message.proof) : message.proof;
+                object.proof = $root.merkle.Proof.toObject(message.proof, options);
             if (message.height != null && message.hasOwnProperty("height"))
                 if (typeof message.height === "number")
                     object.height = options.longs === String ? String(message.height) : message.height;
                 else
                     object.height = options.longs === String ? $util.Long.prototype.toString.call(message.height) : options.longs === Number ? new $util.LongBits(message.height.low >>> 0, message.height.high >>> 0).toNumber() : message.height;
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                object.codespace = message.codespace;
             return object;
         };
 
@@ -5437,6 +5564,7 @@ $root.abci = (function() {
          * @property {number|Long|null} [gasWanted] ResponseCheckTx gasWanted
          * @property {number|Long|null} [gasUsed] ResponseCheckTx gasUsed
          * @property {Array.<common.IKVPair>|null} [tags] ResponseCheckTx tags
+         * @property {string|null} [codespace] ResponseCheckTx codespace
          */
 
         /**
@@ -5512,6 +5640,14 @@ $root.abci = (function() {
         ResponseCheckTx.prototype.tags = $util.emptyArray;
 
         /**
+         * ResponseCheckTx codespace.
+         * @member {string} codespace
+         * @memberof abci.ResponseCheckTx
+         * @instance
+         */
+        ResponseCheckTx.prototype.codespace = "";
+
+        /**
          * Creates a new ResponseCheckTx instance using the specified properties.
          * @function create
          * @memberof abci.ResponseCheckTx
@@ -5550,6 +5686,8 @@ $root.abci = (function() {
             if (message.tags != null && message.tags.length)
                 for (var i = 0; i < message.tags.length; ++i)
                     $root.common.KVPair.encode(message.tags[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                writer.uint32(/* id 8, wireType 2 =*/66).string(message.codespace);
             return writer;
         };
 
@@ -5606,6 +5744,9 @@ $root.abci = (function() {
                     if (!(message.tags && message.tags.length))
                         message.tags = [];
                     message.tags.push($root.common.KVPair.decode(reader, reader.uint32()));
+                    break;
+                case 8:
+                    message.codespace = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -5669,6 +5810,9 @@ $root.abci = (function() {
                         return "tags." + error;
                 }
             }
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                if (!$util.isString(message.codespace))
+                    return "codespace: string expected";
             return null;
         };
 
@@ -5723,6 +5867,8 @@ $root.abci = (function() {
                     message.tags[i] = $root.common.KVPair.fromObject(object.tags[i]);
                 }
             }
+            if (object.codespace != null)
+                message.codespace = String(object.codespace);
             return message;
         };
 
@@ -5762,6 +5908,7 @@ $root.abci = (function() {
                     object.gasUsed = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
                     object.gasUsed = options.longs === String ? "0" : 0;
+                object.codespace = "";
             }
             if (message.code != null && message.hasOwnProperty("code"))
                 object.code = message.code;
@@ -5786,6 +5933,8 @@ $root.abci = (function() {
                 for (var j = 0; j < message.tags.length; ++j)
                     object.tags[j] = $root.common.KVPair.toObject(message.tags[j], options);
             }
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                object.codespace = message.codespace;
             return object;
         };
 
@@ -5816,6 +5965,7 @@ $root.abci = (function() {
          * @property {number|Long|null} [gasWanted] ResponseDeliverTx gasWanted
          * @property {number|Long|null} [gasUsed] ResponseDeliverTx gasUsed
          * @property {Array.<common.IKVPair>|null} [tags] ResponseDeliverTx tags
+         * @property {string|null} [codespace] ResponseDeliverTx codespace
          */
 
         /**
@@ -5891,6 +6041,14 @@ $root.abci = (function() {
         ResponseDeliverTx.prototype.tags = $util.emptyArray;
 
         /**
+         * ResponseDeliverTx codespace.
+         * @member {string} codespace
+         * @memberof abci.ResponseDeliverTx
+         * @instance
+         */
+        ResponseDeliverTx.prototype.codespace = "";
+
+        /**
          * Creates a new ResponseDeliverTx instance using the specified properties.
          * @function create
          * @memberof abci.ResponseDeliverTx
@@ -5929,6 +6087,8 @@ $root.abci = (function() {
             if (message.tags != null && message.tags.length)
                 for (var i = 0; i < message.tags.length; ++i)
                     $root.common.KVPair.encode(message.tags[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                writer.uint32(/* id 8, wireType 2 =*/66).string(message.codespace);
             return writer;
         };
 
@@ -5985,6 +6145,9 @@ $root.abci = (function() {
                     if (!(message.tags && message.tags.length))
                         message.tags = [];
                     message.tags.push($root.common.KVPair.decode(reader, reader.uint32()));
+                    break;
+                case 8:
+                    message.codespace = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -6048,6 +6211,9 @@ $root.abci = (function() {
                         return "tags." + error;
                 }
             }
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                if (!$util.isString(message.codespace))
+                    return "codespace: string expected";
             return null;
         };
 
@@ -6102,6 +6268,8 @@ $root.abci = (function() {
                     message.tags[i] = $root.common.KVPair.fromObject(object.tags[i]);
                 }
             }
+            if (object.codespace != null)
+                message.codespace = String(object.codespace);
             return message;
         };
 
@@ -6141,6 +6309,7 @@ $root.abci = (function() {
                     object.gasUsed = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
                     object.gasUsed = options.longs === String ? "0" : 0;
+                object.codespace = "";
             }
             if (message.code != null && message.hasOwnProperty("code"))
                 object.code = message.code;
@@ -6165,6 +6334,8 @@ $root.abci = (function() {
                 for (var j = 0; j < message.tags.length; ++j)
                     object.tags[j] = $root.common.KVPair.toObject(message.tags[j], options);
             }
+            if (message.codespace != null && message.hasOwnProperty("codespace"))
+                object.codespace = message.codespace;
             return object;
         };
 
@@ -6664,9 +6835,9 @@ $root.abci = (function() {
          * Properties of a ConsensusParams.
          * @memberof abci
          * @interface IConsensusParams
-         * @property {abci.IBlockSize|null} [blockSize] ConsensusParams blockSize
-         * @property {abci.ITxSize|null} [txSize] ConsensusParams txSize
-         * @property {abci.IBlockGossip|null} [blockGossip] ConsensusParams blockGossip
+         * @property {abci.IBlockSizeParams|null} [blockSize] ConsensusParams blockSize
+         * @property {abci.IEvidenceParams|null} [evidence] ConsensusParams evidence
+         * @property {abci.IValidatorParams|null} [validator] ConsensusParams validator
          */
 
         /**
@@ -6686,27 +6857,27 @@ $root.abci = (function() {
 
         /**
          * ConsensusParams blockSize.
-         * @member {abci.IBlockSize|null|undefined} blockSize
+         * @member {abci.IBlockSizeParams|null|undefined} blockSize
          * @memberof abci.ConsensusParams
          * @instance
          */
         ConsensusParams.prototype.blockSize = null;
 
         /**
-         * ConsensusParams txSize.
-         * @member {abci.ITxSize|null|undefined} txSize
+         * ConsensusParams evidence.
+         * @member {abci.IEvidenceParams|null|undefined} evidence
          * @memberof abci.ConsensusParams
          * @instance
          */
-        ConsensusParams.prototype.txSize = null;
+        ConsensusParams.prototype.evidence = null;
 
         /**
-         * ConsensusParams blockGossip.
-         * @member {abci.IBlockGossip|null|undefined} blockGossip
+         * ConsensusParams validator.
+         * @member {abci.IValidatorParams|null|undefined} validator
          * @memberof abci.ConsensusParams
          * @instance
          */
-        ConsensusParams.prototype.blockGossip = null;
+        ConsensusParams.prototype.validator = null;
 
         /**
          * Creates a new ConsensusParams instance using the specified properties.
@@ -6733,11 +6904,11 @@ $root.abci = (function() {
             if (!writer)
                 writer = $Writer.create();
             if (message.blockSize != null && message.hasOwnProperty("blockSize"))
-                $root.abci.BlockSize.encode(message.blockSize, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.txSize != null && message.hasOwnProperty("txSize"))
-                $root.abci.TxSize.encode(message.txSize, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.blockGossip != null && message.hasOwnProperty("blockGossip"))
-                $root.abci.BlockGossip.encode(message.blockGossip, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                $root.abci.BlockSizeParams.encode(message.blockSize, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.evidence != null && message.hasOwnProperty("evidence"))
+                $root.abci.EvidenceParams.encode(message.evidence, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.validator != null && message.hasOwnProperty("validator"))
+                $root.abci.ValidatorParams.encode(message.validator, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
 
@@ -6773,13 +6944,13 @@ $root.abci = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.blockSize = $root.abci.BlockSize.decode(reader, reader.uint32());
+                    message.blockSize = $root.abci.BlockSizeParams.decode(reader, reader.uint32());
                     break;
                 case 2:
-                    message.txSize = $root.abci.TxSize.decode(reader, reader.uint32());
+                    message.evidence = $root.abci.EvidenceParams.decode(reader, reader.uint32());
                     break;
                 case 3:
-                    message.blockGossip = $root.abci.BlockGossip.decode(reader, reader.uint32());
+                    message.validator = $root.abci.ValidatorParams.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -6817,19 +6988,19 @@ $root.abci = (function() {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.blockSize != null && message.hasOwnProperty("blockSize")) {
-                var error = $root.abci.BlockSize.verify(message.blockSize);
+                var error = $root.abci.BlockSizeParams.verify(message.blockSize);
                 if (error)
                     return "blockSize." + error;
             }
-            if (message.txSize != null && message.hasOwnProperty("txSize")) {
-                var error = $root.abci.TxSize.verify(message.txSize);
+            if (message.evidence != null && message.hasOwnProperty("evidence")) {
+                var error = $root.abci.EvidenceParams.verify(message.evidence);
                 if (error)
-                    return "txSize." + error;
+                    return "evidence." + error;
             }
-            if (message.blockGossip != null && message.hasOwnProperty("blockGossip")) {
-                var error = $root.abci.BlockGossip.verify(message.blockGossip);
+            if (message.validator != null && message.hasOwnProperty("validator")) {
+                var error = $root.abci.ValidatorParams.verify(message.validator);
                 if (error)
-                    return "blockGossip." + error;
+                    return "validator." + error;
             }
             return null;
         };
@@ -6849,17 +7020,17 @@ $root.abci = (function() {
             if (object.blockSize != null) {
                 if (typeof object.blockSize !== "object")
                     throw TypeError(".abci.ConsensusParams.blockSize: object expected");
-                message.blockSize = $root.abci.BlockSize.fromObject(object.blockSize);
+                message.blockSize = $root.abci.BlockSizeParams.fromObject(object.blockSize);
             }
-            if (object.txSize != null) {
-                if (typeof object.txSize !== "object")
-                    throw TypeError(".abci.ConsensusParams.txSize: object expected");
-                message.txSize = $root.abci.TxSize.fromObject(object.txSize);
+            if (object.evidence != null) {
+                if (typeof object.evidence !== "object")
+                    throw TypeError(".abci.ConsensusParams.evidence: object expected");
+                message.evidence = $root.abci.EvidenceParams.fromObject(object.evidence);
             }
-            if (object.blockGossip != null) {
-                if (typeof object.blockGossip !== "object")
-                    throw TypeError(".abci.ConsensusParams.blockGossip: object expected");
-                message.blockGossip = $root.abci.BlockGossip.fromObject(object.blockGossip);
+            if (object.validator != null) {
+                if (typeof object.validator !== "object")
+                    throw TypeError(".abci.ConsensusParams.validator: object expected");
+                message.validator = $root.abci.ValidatorParams.fromObject(object.validator);
             }
             return message;
         };
@@ -6879,15 +7050,15 @@ $root.abci = (function() {
             var object = {};
             if (options.defaults) {
                 object.blockSize = null;
-                object.txSize = null;
-                object.blockGossip = null;
+                object.evidence = null;
+                object.validator = null;
             }
             if (message.blockSize != null && message.hasOwnProperty("blockSize"))
-                object.blockSize = $root.abci.BlockSize.toObject(message.blockSize, options);
-            if (message.txSize != null && message.hasOwnProperty("txSize"))
-                object.txSize = $root.abci.TxSize.toObject(message.txSize, options);
-            if (message.blockGossip != null && message.hasOwnProperty("blockGossip"))
-                object.blockGossip = $root.abci.BlockGossip.toObject(message.blockGossip, options);
+                object.blockSize = $root.abci.BlockSizeParams.toObject(message.blockSize, options);
+            if (message.evidence != null && message.hasOwnProperty("evidence"))
+                object.evidence = $root.abci.EvidenceParams.toObject(message.evidence, options);
+            if (message.validator != null && message.hasOwnProperty("validator"))
+                object.validator = $root.abci.ValidatorParams.toObject(message.validator, options);
             return object;
         };
 
@@ -6905,25 +7076,25 @@ $root.abci = (function() {
         return ConsensusParams;
     })();
 
-    abci.BlockSize = (function() {
+    abci.BlockSizeParams = (function() {
 
         /**
-         * Properties of a BlockSize.
+         * Properties of a BlockSizeParams.
          * @memberof abci
-         * @interface IBlockSize
-         * @property {number|null} [maxBytes] BlockSize maxBytes
-         * @property {number|Long|null} [maxGas] BlockSize maxGas
+         * @interface IBlockSizeParams
+         * @property {number|Long|null} [maxBytes] BlockSizeParams maxBytes
+         * @property {number|Long|null} [maxGas] BlockSizeParams maxGas
          */
 
         /**
-         * Constructs a new BlockSize.
+         * Constructs a new BlockSizeParams.
          * @memberof abci
-         * @classdesc Represents a BlockSize.
-         * @implements IBlockSize
+         * @classdesc Represents a BlockSizeParams.
+         * @implements IBlockSizeParams
          * @constructor
-         * @param {abci.IBlockSize=} [properties] Properties to set
+         * @param {abci.IBlockSizeParams=} [properties] Properties to set
          */
-        function BlockSize(properties) {
+        function BlockSizeParams(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -6931,85 +7102,85 @@ $root.abci = (function() {
         }
 
         /**
-         * BlockSize maxBytes.
-         * @member {number} maxBytes
-         * @memberof abci.BlockSize
+         * BlockSizeParams maxBytes.
+         * @member {number|Long} maxBytes
+         * @memberof abci.BlockSizeParams
          * @instance
          */
-        BlockSize.prototype.maxBytes = 0;
+        BlockSizeParams.prototype.maxBytes = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
         /**
-         * BlockSize maxGas.
+         * BlockSizeParams maxGas.
          * @member {number|Long} maxGas
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @instance
          */
-        BlockSize.prototype.maxGas = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+        BlockSizeParams.prototype.maxGas = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
         /**
-         * Creates a new BlockSize instance using the specified properties.
+         * Creates a new BlockSizeParams instance using the specified properties.
          * @function create
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
-         * @param {abci.IBlockSize=} [properties] Properties to set
-         * @returns {abci.BlockSize} BlockSize instance
+         * @param {abci.IBlockSizeParams=} [properties] Properties to set
+         * @returns {abci.BlockSizeParams} BlockSizeParams instance
          */
-        BlockSize.create = function create(properties) {
-            return new BlockSize(properties);
+        BlockSizeParams.create = function create(properties) {
+            return new BlockSizeParams(properties);
         };
 
         /**
-         * Encodes the specified BlockSize message. Does not implicitly {@link abci.BlockSize.verify|verify} messages.
+         * Encodes the specified BlockSizeParams message. Does not implicitly {@link abci.BlockSizeParams.verify|verify} messages.
          * @function encode
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
-         * @param {abci.IBlockSize} message BlockSize message or plain object to encode
+         * @param {abci.IBlockSizeParams} message BlockSizeParams message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        BlockSize.encode = function encode(message, writer) {
+        BlockSizeParams.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.maxBytes != null && message.hasOwnProperty("maxBytes"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.maxBytes);
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.maxBytes);
             if (message.maxGas != null && message.hasOwnProperty("maxGas"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int64(message.maxGas);
             return writer;
         };
 
         /**
-         * Encodes the specified BlockSize message, length delimited. Does not implicitly {@link abci.BlockSize.verify|verify} messages.
+         * Encodes the specified BlockSizeParams message, length delimited. Does not implicitly {@link abci.BlockSizeParams.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
-         * @param {abci.IBlockSize} message BlockSize message or plain object to encode
+         * @param {abci.IBlockSizeParams} message BlockSizeParams message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        BlockSize.encodeDelimited = function encodeDelimited(message, writer) {
+        BlockSizeParams.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a BlockSize message from the specified reader or buffer.
+         * Decodes a BlockSizeParams message from the specified reader or buffer.
          * @function decode
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {abci.BlockSize} BlockSize
+         * @returns {abci.BlockSizeParams} BlockSizeParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        BlockSize.decode = function decode(reader, length) {
+        BlockSizeParams.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.BlockSize();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.BlockSizeParams();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.maxBytes = reader.int32();
+                    message.maxBytes = reader.int64();
                     break;
                 case 2:
                     message.maxGas = reader.int64();
@@ -7023,35 +7194,35 @@ $root.abci = (function() {
         };
 
         /**
-         * Decodes a BlockSize message from the specified reader or buffer, length delimited.
+         * Decodes a BlockSizeParams message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {abci.BlockSize} BlockSize
+         * @returns {abci.BlockSizeParams} BlockSizeParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        BlockSize.decodeDelimited = function decodeDelimited(reader) {
+        BlockSizeParams.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a BlockSize message.
+         * Verifies a BlockSizeParams message.
          * @function verify
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        BlockSize.verify = function verify(message) {
+        BlockSizeParams.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.maxBytes != null && message.hasOwnProperty("maxBytes"))
-                if (!$util.isInteger(message.maxBytes))
-                    return "maxBytes: integer expected";
+                if (!$util.isInteger(message.maxBytes) && !(message.maxBytes && $util.isInteger(message.maxBytes.low) && $util.isInteger(message.maxBytes.high)))
+                    return "maxBytes: integer|Long expected";
             if (message.maxGas != null && message.hasOwnProperty("maxGas"))
                 if (!$util.isInteger(message.maxGas) && !(message.maxGas && $util.isInteger(message.maxGas.low) && $util.isInteger(message.maxGas.high)))
                     return "maxGas: integer|Long expected";
@@ -7059,19 +7230,26 @@ $root.abci = (function() {
         };
 
         /**
-         * Creates a BlockSize message from a plain object. Also converts values to their respective internal types.
+         * Creates a BlockSizeParams message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {abci.BlockSize} BlockSize
+         * @returns {abci.BlockSizeParams} BlockSizeParams
          */
-        BlockSize.fromObject = function fromObject(object) {
-            if (object instanceof $root.abci.BlockSize)
+        BlockSizeParams.fromObject = function fromObject(object) {
+            if (object instanceof $root.abci.BlockSizeParams)
                 return object;
-            var message = new $root.abci.BlockSize();
+            var message = new $root.abci.BlockSizeParams();
             if (object.maxBytes != null)
-                message.maxBytes = object.maxBytes | 0;
+                if ($util.Long)
+                    (message.maxBytes = $util.Long.fromValue(object.maxBytes)).unsigned = false;
+                else if (typeof object.maxBytes === "string")
+                    message.maxBytes = parseInt(object.maxBytes, 10);
+                else if (typeof object.maxBytes === "number")
+                    message.maxBytes = object.maxBytes;
+                else if (typeof object.maxBytes === "object")
+                    message.maxBytes = new $util.LongBits(object.maxBytes.low >>> 0, object.maxBytes.high >>> 0).toNumber();
             if (object.maxGas != null)
                 if ($util.Long)
                     (message.maxGas = $util.Long.fromValue(object.maxGas)).unsigned = false;
@@ -7085,20 +7263,24 @@ $root.abci = (function() {
         };
 
         /**
-         * Creates a plain object from a BlockSize message. Also converts values to other types if specified.
+         * Creates a plain object from a BlockSizeParams message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @static
-         * @param {abci.BlockSize} message BlockSize
+         * @param {abci.BlockSizeParams} message BlockSizeParams
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        BlockSize.toObject = function toObject(message, options) {
+        BlockSizeParams.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
             if (options.defaults) {
-                object.maxBytes = 0;
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.maxBytes = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.maxBytes = options.longs === String ? "0" : 0;
                 if ($util.Long) {
                     var long = new $util.Long(0, 0, false);
                     object.maxGas = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
@@ -7106,7 +7288,10 @@ $root.abci = (function() {
                     object.maxGas = options.longs === String ? "0" : 0;
             }
             if (message.maxBytes != null && message.hasOwnProperty("maxBytes"))
-                object.maxBytes = message.maxBytes;
+                if (typeof message.maxBytes === "number")
+                    object.maxBytes = options.longs === String ? String(message.maxBytes) : message.maxBytes;
+                else
+                    object.maxBytes = options.longs === String ? $util.Long.prototype.toString.call(message.maxBytes) : options.longs === Number ? new $util.LongBits(message.maxBytes.low >>> 0, message.maxBytes.high >>> 0).toNumber() : message.maxBytes;
             if (message.maxGas != null && message.hasOwnProperty("maxGas"))
                 if (typeof message.maxGas === "number")
                     object.maxGas = options.longs === String ? String(message.maxGas) : message.maxGas;
@@ -7116,38 +7301,37 @@ $root.abci = (function() {
         };
 
         /**
-         * Converts this BlockSize to JSON.
+         * Converts this BlockSizeParams to JSON.
          * @function toJSON
-         * @memberof abci.BlockSize
+         * @memberof abci.BlockSizeParams
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        BlockSize.prototype.toJSON = function toJSON() {
+        BlockSizeParams.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
-        return BlockSize;
+        return BlockSizeParams;
     })();
 
-    abci.TxSize = (function() {
+    abci.EvidenceParams = (function() {
 
         /**
-         * Properties of a TxSize.
+         * Properties of an EvidenceParams.
          * @memberof abci
-         * @interface ITxSize
-         * @property {number|null} [maxBytes] TxSize maxBytes
-         * @property {number|Long|null} [maxGas] TxSize maxGas
+         * @interface IEvidenceParams
+         * @property {number|Long|null} [maxAge] EvidenceParams maxAge
          */
 
         /**
-         * Constructs a new TxSize.
+         * Constructs a new EvidenceParams.
          * @memberof abci
-         * @classdesc Represents a TxSize.
-         * @implements ITxSize
+         * @classdesc Represents an EvidenceParams.
+         * @implements IEvidenceParams
          * @constructor
-         * @param {abci.ITxSize=} [properties] Properties to set
+         * @param {abci.IEvidenceParams=} [properties] Properties to set
          */
-        function TxSize(properties) {
+        function EvidenceParams(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -7155,88 +7339,75 @@ $root.abci = (function() {
         }
 
         /**
-         * TxSize maxBytes.
-         * @member {number} maxBytes
-         * @memberof abci.TxSize
+         * EvidenceParams maxAge.
+         * @member {number|Long} maxAge
+         * @memberof abci.EvidenceParams
          * @instance
          */
-        TxSize.prototype.maxBytes = 0;
+        EvidenceParams.prototype.maxAge = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
         /**
-         * TxSize maxGas.
-         * @member {number|Long} maxGas
-         * @memberof abci.TxSize
-         * @instance
-         */
-        TxSize.prototype.maxGas = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-
-        /**
-         * Creates a new TxSize instance using the specified properties.
+         * Creates a new EvidenceParams instance using the specified properties.
          * @function create
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
-         * @param {abci.ITxSize=} [properties] Properties to set
-         * @returns {abci.TxSize} TxSize instance
+         * @param {abci.IEvidenceParams=} [properties] Properties to set
+         * @returns {abci.EvidenceParams} EvidenceParams instance
          */
-        TxSize.create = function create(properties) {
-            return new TxSize(properties);
+        EvidenceParams.create = function create(properties) {
+            return new EvidenceParams(properties);
         };
 
         /**
-         * Encodes the specified TxSize message. Does not implicitly {@link abci.TxSize.verify|verify} messages.
+         * Encodes the specified EvidenceParams message. Does not implicitly {@link abci.EvidenceParams.verify|verify} messages.
          * @function encode
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
-         * @param {abci.ITxSize} message TxSize message or plain object to encode
+         * @param {abci.IEvidenceParams} message EvidenceParams message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        TxSize.encode = function encode(message, writer) {
+        EvidenceParams.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.maxBytes != null && message.hasOwnProperty("maxBytes"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.maxBytes);
-            if (message.maxGas != null && message.hasOwnProperty("maxGas"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int64(message.maxGas);
+            if (message.maxAge != null && message.hasOwnProperty("maxAge"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.maxAge);
             return writer;
         };
 
         /**
-         * Encodes the specified TxSize message, length delimited. Does not implicitly {@link abci.TxSize.verify|verify} messages.
+         * Encodes the specified EvidenceParams message, length delimited. Does not implicitly {@link abci.EvidenceParams.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
-         * @param {abci.ITxSize} message TxSize message or plain object to encode
+         * @param {abci.IEvidenceParams} message EvidenceParams message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        TxSize.encodeDelimited = function encodeDelimited(message, writer) {
+        EvidenceParams.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a TxSize message from the specified reader or buffer.
+         * Decodes an EvidenceParams message from the specified reader or buffer.
          * @function decode
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {abci.TxSize} TxSize
+         * @returns {abci.EvidenceParams} EvidenceParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        TxSize.decode = function decode(reader, length) {
+        EvidenceParams.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.TxSize();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.EvidenceParams();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.maxBytes = reader.int32();
-                    break;
-                case 2:
-                    message.maxGas = reader.int64();
+                    message.maxAge = reader.int64();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -7247,297 +7418,304 @@ $root.abci = (function() {
         };
 
         /**
-         * Decodes a TxSize message from the specified reader or buffer, length delimited.
+         * Decodes an EvidenceParams message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {abci.TxSize} TxSize
+         * @returns {abci.EvidenceParams} EvidenceParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        TxSize.decodeDelimited = function decodeDelimited(reader) {
+        EvidenceParams.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a TxSize message.
+         * Verifies an EvidenceParams message.
          * @function verify
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        TxSize.verify = function verify(message) {
+        EvidenceParams.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.maxBytes != null && message.hasOwnProperty("maxBytes"))
-                if (!$util.isInteger(message.maxBytes))
-                    return "maxBytes: integer expected";
-            if (message.maxGas != null && message.hasOwnProperty("maxGas"))
-                if (!$util.isInteger(message.maxGas) && !(message.maxGas && $util.isInteger(message.maxGas.low) && $util.isInteger(message.maxGas.high)))
-                    return "maxGas: integer|Long expected";
+            if (message.maxAge != null && message.hasOwnProperty("maxAge"))
+                if (!$util.isInteger(message.maxAge) && !(message.maxAge && $util.isInteger(message.maxAge.low) && $util.isInteger(message.maxAge.high)))
+                    return "maxAge: integer|Long expected";
             return null;
         };
 
         /**
-         * Creates a TxSize message from a plain object. Also converts values to their respective internal types.
+         * Creates an EvidenceParams message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {abci.TxSize} TxSize
+         * @returns {abci.EvidenceParams} EvidenceParams
          */
-        TxSize.fromObject = function fromObject(object) {
-            if (object instanceof $root.abci.TxSize)
+        EvidenceParams.fromObject = function fromObject(object) {
+            if (object instanceof $root.abci.EvidenceParams)
                 return object;
-            var message = new $root.abci.TxSize();
-            if (object.maxBytes != null)
-                message.maxBytes = object.maxBytes | 0;
-            if (object.maxGas != null)
+            var message = new $root.abci.EvidenceParams();
+            if (object.maxAge != null)
                 if ($util.Long)
-                    (message.maxGas = $util.Long.fromValue(object.maxGas)).unsigned = false;
-                else if (typeof object.maxGas === "string")
-                    message.maxGas = parseInt(object.maxGas, 10);
-                else if (typeof object.maxGas === "number")
-                    message.maxGas = object.maxGas;
-                else if (typeof object.maxGas === "object")
-                    message.maxGas = new $util.LongBits(object.maxGas.low >>> 0, object.maxGas.high >>> 0).toNumber();
+                    (message.maxAge = $util.Long.fromValue(object.maxAge)).unsigned = false;
+                else if (typeof object.maxAge === "string")
+                    message.maxAge = parseInt(object.maxAge, 10);
+                else if (typeof object.maxAge === "number")
+                    message.maxAge = object.maxAge;
+                else if (typeof object.maxAge === "object")
+                    message.maxAge = new $util.LongBits(object.maxAge.low >>> 0, object.maxAge.high >>> 0).toNumber();
             return message;
         };
 
         /**
-         * Creates a plain object from a TxSize message. Also converts values to other types if specified.
+         * Creates a plain object from an EvidenceParams message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof abci.TxSize
+         * @memberof abci.EvidenceParams
          * @static
-         * @param {abci.TxSize} message TxSize
+         * @param {abci.EvidenceParams} message EvidenceParams
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        TxSize.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.maxBytes = 0;
-                if ($util.Long) {
-                    var long = new $util.Long(0, 0, false);
-                    object.maxGas = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
-                } else
-                    object.maxGas = options.longs === String ? "0" : 0;
-            }
-            if (message.maxBytes != null && message.hasOwnProperty("maxBytes"))
-                object.maxBytes = message.maxBytes;
-            if (message.maxGas != null && message.hasOwnProperty("maxGas"))
-                if (typeof message.maxGas === "number")
-                    object.maxGas = options.longs === String ? String(message.maxGas) : message.maxGas;
-                else
-                    object.maxGas = options.longs === String ? $util.Long.prototype.toString.call(message.maxGas) : options.longs === Number ? new $util.LongBits(message.maxGas.low >>> 0, message.maxGas.high >>> 0).toNumber() : message.maxGas;
-            return object;
-        };
-
-        /**
-         * Converts this TxSize to JSON.
-         * @function toJSON
-         * @memberof abci.TxSize
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        TxSize.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return TxSize;
-    })();
-
-    abci.BlockGossip = (function() {
-
-        /**
-         * Properties of a BlockGossip.
-         * @memberof abci
-         * @interface IBlockGossip
-         * @property {number|null} [blockPartSizeBytes] BlockGossip blockPartSizeBytes
-         */
-
-        /**
-         * Constructs a new BlockGossip.
-         * @memberof abci
-         * @classdesc Represents a BlockGossip.
-         * @implements IBlockGossip
-         * @constructor
-         * @param {abci.IBlockGossip=} [properties] Properties to set
-         */
-        function BlockGossip(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * BlockGossip blockPartSizeBytes.
-         * @member {number} blockPartSizeBytes
-         * @memberof abci.BlockGossip
-         * @instance
-         */
-        BlockGossip.prototype.blockPartSizeBytes = 0;
-
-        /**
-         * Creates a new BlockGossip instance using the specified properties.
-         * @function create
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {abci.IBlockGossip=} [properties] Properties to set
-         * @returns {abci.BlockGossip} BlockGossip instance
-         */
-        BlockGossip.create = function create(properties) {
-            return new BlockGossip(properties);
-        };
-
-        /**
-         * Encodes the specified BlockGossip message. Does not implicitly {@link abci.BlockGossip.verify|verify} messages.
-         * @function encode
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {abci.IBlockGossip} message BlockGossip message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        BlockGossip.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.blockPartSizeBytes != null && message.hasOwnProperty("blockPartSizeBytes"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.blockPartSizeBytes);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified BlockGossip message, length delimited. Does not implicitly {@link abci.BlockGossip.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {abci.IBlockGossip} message BlockGossip message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        BlockGossip.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a BlockGossip message from the specified reader or buffer.
-         * @function decode
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {abci.BlockGossip} BlockGossip
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        BlockGossip.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.BlockGossip();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.blockPartSizeBytes = reader.int32();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a BlockGossip message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {abci.BlockGossip} BlockGossip
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        BlockGossip.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a BlockGossip message.
-         * @function verify
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        BlockGossip.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.blockPartSizeBytes != null && message.hasOwnProperty("blockPartSizeBytes"))
-                if (!$util.isInteger(message.blockPartSizeBytes))
-                    return "blockPartSizeBytes: integer expected";
-            return null;
-        };
-
-        /**
-         * Creates a BlockGossip message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {abci.BlockGossip} BlockGossip
-         */
-        BlockGossip.fromObject = function fromObject(object) {
-            if (object instanceof $root.abci.BlockGossip)
-                return object;
-            var message = new $root.abci.BlockGossip();
-            if (object.blockPartSizeBytes != null)
-                message.blockPartSizeBytes = object.blockPartSizeBytes | 0;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a BlockGossip message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof abci.BlockGossip
-         * @static
-         * @param {abci.BlockGossip} message BlockGossip
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        BlockGossip.toObject = function toObject(message, options) {
+        EvidenceParams.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
             if (options.defaults)
-                object.blockPartSizeBytes = 0;
-            if (message.blockPartSizeBytes != null && message.hasOwnProperty("blockPartSizeBytes"))
-                object.blockPartSizeBytes = message.blockPartSizeBytes;
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.maxAge = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.maxAge = options.longs === String ? "0" : 0;
+            if (message.maxAge != null && message.hasOwnProperty("maxAge"))
+                if (typeof message.maxAge === "number")
+                    object.maxAge = options.longs === String ? String(message.maxAge) : message.maxAge;
+                else
+                    object.maxAge = options.longs === String ? $util.Long.prototype.toString.call(message.maxAge) : options.longs === Number ? new $util.LongBits(message.maxAge.low >>> 0, message.maxAge.high >>> 0).toNumber() : message.maxAge;
             return object;
         };
 
         /**
-         * Converts this BlockGossip to JSON.
+         * Converts this EvidenceParams to JSON.
          * @function toJSON
-         * @memberof abci.BlockGossip
+         * @memberof abci.EvidenceParams
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        BlockGossip.prototype.toJSON = function toJSON() {
+        EvidenceParams.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
-        return BlockGossip;
+        return EvidenceParams;
+    })();
+
+    abci.ValidatorParams = (function() {
+
+        /**
+         * Properties of a ValidatorParams.
+         * @memberof abci
+         * @interface IValidatorParams
+         * @property {Array.<string>|null} [pubKeyTypes] ValidatorParams pubKeyTypes
+         */
+
+        /**
+         * Constructs a new ValidatorParams.
+         * @memberof abci
+         * @classdesc Represents a ValidatorParams.
+         * @implements IValidatorParams
+         * @constructor
+         * @param {abci.IValidatorParams=} [properties] Properties to set
+         */
+        function ValidatorParams(properties) {
+            this.pubKeyTypes = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ValidatorParams pubKeyTypes.
+         * @member {Array.<string>} pubKeyTypes
+         * @memberof abci.ValidatorParams
+         * @instance
+         */
+        ValidatorParams.prototype.pubKeyTypes = $util.emptyArray;
+
+        /**
+         * Creates a new ValidatorParams instance using the specified properties.
+         * @function create
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {abci.IValidatorParams=} [properties] Properties to set
+         * @returns {abci.ValidatorParams} ValidatorParams instance
+         */
+        ValidatorParams.create = function create(properties) {
+            return new ValidatorParams(properties);
+        };
+
+        /**
+         * Encodes the specified ValidatorParams message. Does not implicitly {@link abci.ValidatorParams.verify|verify} messages.
+         * @function encode
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {abci.IValidatorParams} message ValidatorParams message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ValidatorParams.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.pubKeyTypes != null && message.pubKeyTypes.length)
+                for (var i = 0; i < message.pubKeyTypes.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.pubKeyTypes[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ValidatorParams message, length delimited. Does not implicitly {@link abci.ValidatorParams.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {abci.IValidatorParams} message ValidatorParams message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ValidatorParams.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a ValidatorParams message from the specified reader or buffer.
+         * @function decode
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {abci.ValidatorParams} ValidatorParams
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ValidatorParams.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.ValidatorParams();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.pubKeyTypes && message.pubKeyTypes.length))
+                        message.pubKeyTypes = [];
+                    message.pubKeyTypes.push(reader.string());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a ValidatorParams message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {abci.ValidatorParams} ValidatorParams
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ValidatorParams.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a ValidatorParams message.
+         * @function verify
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ValidatorParams.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.pubKeyTypes != null && message.hasOwnProperty("pubKeyTypes")) {
+                if (!Array.isArray(message.pubKeyTypes))
+                    return "pubKeyTypes: array expected";
+                for (var i = 0; i < message.pubKeyTypes.length; ++i)
+                    if (!$util.isString(message.pubKeyTypes[i]))
+                        return "pubKeyTypes: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a ValidatorParams message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {abci.ValidatorParams} ValidatorParams
+         */
+        ValidatorParams.fromObject = function fromObject(object) {
+            if (object instanceof $root.abci.ValidatorParams)
+                return object;
+            var message = new $root.abci.ValidatorParams();
+            if (object.pubKeyTypes) {
+                if (!Array.isArray(object.pubKeyTypes))
+                    throw TypeError(".abci.ValidatorParams.pubKeyTypes: array expected");
+                message.pubKeyTypes = [];
+                for (var i = 0; i < object.pubKeyTypes.length; ++i)
+                    message.pubKeyTypes[i] = String(object.pubKeyTypes[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a ValidatorParams message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof abci.ValidatorParams
+         * @static
+         * @param {abci.ValidatorParams} message ValidatorParams
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ValidatorParams.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.pubKeyTypes = [];
+            if (message.pubKeyTypes && message.pubKeyTypes.length) {
+                object.pubKeyTypes = [];
+                for (var j = 0; j < message.pubKeyTypes.length; ++j)
+                    object.pubKeyTypes[j] = message.pubKeyTypes[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this ValidatorParams to JSON.
+         * @function toJSON
+         * @memberof abci.ValidatorParams
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ValidatorParams.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return ValidatorParams;
     })();
 
     abci.LastCommitInfo = (function() {
@@ -7777,6 +7955,7 @@ $root.abci = (function() {
          * Properties of a Header.
          * @memberof abci
          * @interface IHeader
+         * @property {abci.IVersion|null} [version] Header version
          * @property {string|null} [chainId] Header chainId
          * @property {number|Long|null} [height] Header height
          * @property {google.protobuf.ITimestamp|null} [time] Header time
@@ -7808,6 +7987,14 @@ $root.abci = (function() {
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
+
+        /**
+         * Header version.
+         * @member {abci.IVersion|null|undefined} version
+         * @memberof abci.Header
+         * @instance
+         */
+        Header.prototype.version = null;
 
         /**
          * Header chainId.
@@ -7953,36 +8140,38 @@ $root.abci = (function() {
         Header.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
+            if (message.version != null && message.hasOwnProperty("version"))
+                $root.abci.Version.encode(message.version, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.chainId != null && message.hasOwnProperty("chainId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.chainId);
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.chainId);
             if (message.height != null && message.hasOwnProperty("height"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int64(message.height);
+                writer.uint32(/* id 3, wireType 0 =*/24).int64(message.height);
             if (message.time != null && message.hasOwnProperty("time"))
-                $root.google.protobuf.Timestamp.encode(message.time, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                $root.google.protobuf.Timestamp.encode(message.time, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             if (message.numTxs != null && message.hasOwnProperty("numTxs"))
-                writer.uint32(/* id 4, wireType 0 =*/32).int64(message.numTxs);
+                writer.uint32(/* id 5, wireType 0 =*/40).int64(message.numTxs);
             if (message.totalTxs != null && message.hasOwnProperty("totalTxs"))
-                writer.uint32(/* id 5, wireType 0 =*/40).int64(message.totalTxs);
+                writer.uint32(/* id 6, wireType 0 =*/48).int64(message.totalTxs);
             if (message.lastBlockId != null && message.hasOwnProperty("lastBlockId"))
-                $root.abci.BlockID.encode(message.lastBlockId, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                $root.abci.BlockID.encode(message.lastBlockId, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
             if (message.lastCommitHash != null && message.hasOwnProperty("lastCommitHash"))
-                writer.uint32(/* id 7, wireType 2 =*/58).bytes(message.lastCommitHash);
+                writer.uint32(/* id 8, wireType 2 =*/66).bytes(message.lastCommitHash);
             if (message.dataHash != null && message.hasOwnProperty("dataHash"))
-                writer.uint32(/* id 8, wireType 2 =*/66).bytes(message.dataHash);
+                writer.uint32(/* id 9, wireType 2 =*/74).bytes(message.dataHash);
             if (message.validatorsHash != null && message.hasOwnProperty("validatorsHash"))
-                writer.uint32(/* id 9, wireType 2 =*/74).bytes(message.validatorsHash);
+                writer.uint32(/* id 10, wireType 2 =*/82).bytes(message.validatorsHash);
             if (message.nextValidatorsHash != null && message.hasOwnProperty("nextValidatorsHash"))
-                writer.uint32(/* id 10, wireType 2 =*/82).bytes(message.nextValidatorsHash);
+                writer.uint32(/* id 11, wireType 2 =*/90).bytes(message.nextValidatorsHash);
             if (message.consensusHash != null && message.hasOwnProperty("consensusHash"))
-                writer.uint32(/* id 11, wireType 2 =*/90).bytes(message.consensusHash);
+                writer.uint32(/* id 12, wireType 2 =*/98).bytes(message.consensusHash);
             if (message.appHash != null && message.hasOwnProperty("appHash"))
-                writer.uint32(/* id 12, wireType 2 =*/98).bytes(message.appHash);
+                writer.uint32(/* id 13, wireType 2 =*/106).bytes(message.appHash);
             if (message.lastResultsHash != null && message.hasOwnProperty("lastResultsHash"))
-                writer.uint32(/* id 13, wireType 2 =*/106).bytes(message.lastResultsHash);
+                writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.lastResultsHash);
             if (message.evidenceHash != null && message.hasOwnProperty("evidenceHash"))
-                writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.evidenceHash);
+                writer.uint32(/* id 15, wireType 2 =*/122).bytes(message.evidenceHash);
             if (message.proposerAddress != null && message.hasOwnProperty("proposerAddress"))
-                writer.uint32(/* id 15, wireType 2 =*/122).bytes(message.proposerAddress);
+                writer.uint32(/* id 16, wireType 2 =*/130).bytes(message.proposerAddress);
             return writer;
         };
 
@@ -8018,48 +8207,51 @@ $root.abci = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.chainId = reader.string();
+                    message.version = $root.abci.Version.decode(reader, reader.uint32());
                     break;
                 case 2:
-                    message.height = reader.int64();
+                    message.chainId = reader.string();
                     break;
                 case 3:
-                    message.time = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                    message.height = reader.int64();
                     break;
                 case 4:
-                    message.numTxs = reader.int64();
+                    message.time = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                     break;
                 case 5:
-                    message.totalTxs = reader.int64();
+                    message.numTxs = reader.int64();
                     break;
                 case 6:
-                    message.lastBlockId = $root.abci.BlockID.decode(reader, reader.uint32());
+                    message.totalTxs = reader.int64();
                     break;
                 case 7:
-                    message.lastCommitHash = reader.bytes();
+                    message.lastBlockId = $root.abci.BlockID.decode(reader, reader.uint32());
                     break;
                 case 8:
-                    message.dataHash = reader.bytes();
+                    message.lastCommitHash = reader.bytes();
                     break;
                 case 9:
-                    message.validatorsHash = reader.bytes();
+                    message.dataHash = reader.bytes();
                     break;
                 case 10:
-                    message.nextValidatorsHash = reader.bytes();
+                    message.validatorsHash = reader.bytes();
                     break;
                 case 11:
-                    message.consensusHash = reader.bytes();
+                    message.nextValidatorsHash = reader.bytes();
                     break;
                 case 12:
-                    message.appHash = reader.bytes();
+                    message.consensusHash = reader.bytes();
                     break;
                 case 13:
-                    message.lastResultsHash = reader.bytes();
+                    message.appHash = reader.bytes();
                     break;
                 case 14:
-                    message.evidenceHash = reader.bytes();
+                    message.lastResultsHash = reader.bytes();
                     break;
                 case 15:
+                    message.evidenceHash = reader.bytes();
+                    break;
+                case 16:
                     message.proposerAddress = reader.bytes();
                     break;
                 default:
@@ -8097,6 +8289,11 @@ $root.abci = (function() {
         Header.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            if (message.version != null && message.hasOwnProperty("version")) {
+                var error = $root.abci.Version.verify(message.version);
+                if (error)
+                    return "version." + error;
+            }
             if (message.chainId != null && message.hasOwnProperty("chainId"))
                 if (!$util.isString(message.chainId))
                     return "chainId: string expected";
@@ -8161,6 +8358,11 @@ $root.abci = (function() {
             if (object instanceof $root.abci.Header)
                 return object;
             var message = new $root.abci.Header();
+            if (object.version != null) {
+                if (typeof object.version !== "object")
+                    throw TypeError(".abci.Header.version: object expected");
+                message.version = $root.abci.Version.fromObject(object.version);
+            }
             if (object.chainId != null)
                 message.chainId = String(object.chainId);
             if (object.height != null)
@@ -8262,6 +8464,7 @@ $root.abci = (function() {
                 options = {};
             var object = {};
             if (options.defaults) {
+                object.version = null;
                 object.chainId = "";
                 if ($util.Long) {
                     var long = new $util.Long(0, 0, false);
@@ -8344,6 +8547,8 @@ $root.abci = (function() {
                         object.proposerAddress = $util.newBuffer(object.proposerAddress);
                 }
             }
+            if (message.version != null && message.hasOwnProperty("version"))
+                object.version = $root.abci.Version.toObject(message.version, options);
             if (message.chainId != null && message.hasOwnProperty("chainId"))
                 object.chainId = message.chainId;
             if (message.height != null && message.hasOwnProperty("height"))
@@ -8398,6 +8603,244 @@ $root.abci = (function() {
         };
 
         return Header;
+    })();
+
+    abci.Version = (function() {
+
+        /**
+         * Properties of a Version.
+         * @memberof abci
+         * @interface IVersion
+         * @property {number|Long|null} [Block] Version Block
+         * @property {number|Long|null} [App] Version App
+         */
+
+        /**
+         * Constructs a new Version.
+         * @memberof abci
+         * @classdesc Represents a Version.
+         * @implements IVersion
+         * @constructor
+         * @param {abci.IVersion=} [properties] Properties to set
+         */
+        function Version(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Version Block.
+         * @member {number|Long} Block
+         * @memberof abci.Version
+         * @instance
+         */
+        Version.prototype.Block = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+        /**
+         * Version App.
+         * @member {number|Long} App
+         * @memberof abci.Version
+         * @instance
+         */
+        Version.prototype.App = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+        /**
+         * Creates a new Version instance using the specified properties.
+         * @function create
+         * @memberof abci.Version
+         * @static
+         * @param {abci.IVersion=} [properties] Properties to set
+         * @returns {abci.Version} Version instance
+         */
+        Version.create = function create(properties) {
+            return new Version(properties);
+        };
+
+        /**
+         * Encodes the specified Version message. Does not implicitly {@link abci.Version.verify|verify} messages.
+         * @function encode
+         * @memberof abci.Version
+         * @static
+         * @param {abci.IVersion} message Version message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Version.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.Block != null && message.hasOwnProperty("Block"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.Block);
+            if (message.App != null && message.hasOwnProperty("App"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.App);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Version message, length delimited. Does not implicitly {@link abci.Version.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof abci.Version
+         * @static
+         * @param {abci.IVersion} message Version message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Version.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Version message from the specified reader or buffer.
+         * @function decode
+         * @memberof abci.Version
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {abci.Version} Version
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Version.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.Version();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.Block = reader.uint64();
+                    break;
+                case 2:
+                    message.App = reader.uint64();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Version message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof abci.Version
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {abci.Version} Version
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Version.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Version message.
+         * @function verify
+         * @memberof abci.Version
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Version.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.Block != null && message.hasOwnProperty("Block"))
+                if (!$util.isInteger(message.Block) && !(message.Block && $util.isInteger(message.Block.low) && $util.isInteger(message.Block.high)))
+                    return "Block: integer|Long expected";
+            if (message.App != null && message.hasOwnProperty("App"))
+                if (!$util.isInteger(message.App) && !(message.App && $util.isInteger(message.App.low) && $util.isInteger(message.App.high)))
+                    return "App: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a Version message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof abci.Version
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {abci.Version} Version
+         */
+        Version.fromObject = function fromObject(object) {
+            if (object instanceof $root.abci.Version)
+                return object;
+            var message = new $root.abci.Version();
+            if (object.Block != null)
+                if ($util.Long)
+                    (message.Block = $util.Long.fromValue(object.Block)).unsigned = true;
+                else if (typeof object.Block === "string")
+                    message.Block = parseInt(object.Block, 10);
+                else if (typeof object.Block === "number")
+                    message.Block = object.Block;
+                else if (typeof object.Block === "object")
+                    message.Block = new $util.LongBits(object.Block.low >>> 0, object.Block.high >>> 0).toNumber(true);
+            if (object.App != null)
+                if ($util.Long)
+                    (message.App = $util.Long.fromValue(object.App)).unsigned = true;
+                else if (typeof object.App === "string")
+                    message.App = parseInt(object.App, 10);
+                else if (typeof object.App === "number")
+                    message.App = object.App;
+                else if (typeof object.App === "object")
+                    message.App = new $util.LongBits(object.App.low >>> 0, object.App.high >>> 0).toNumber(true);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Version message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof abci.Version
+         * @static
+         * @param {abci.Version} message Version
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Version.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.Block = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.Block = options.longs === String ? "0" : 0;
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.App = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.App = options.longs === String ? "0" : 0;
+            }
+            if (message.Block != null && message.hasOwnProperty("Block"))
+                if (typeof message.Block === "number")
+                    object.Block = options.longs === String ? String(message.Block) : message.Block;
+                else
+                    object.Block = options.longs === String ? $util.Long.prototype.toString.call(message.Block) : options.longs === Number ? new $util.LongBits(message.Block.low >>> 0, message.Block.high >>> 0).toNumber(true) : message.Block;
+            if (message.App != null && message.hasOwnProperty("App"))
+                if (typeof message.App === "number")
+                    object.App = options.longs === String ? String(message.App) : message.App;
+                else
+                    object.App = options.longs === String ? $util.Long.prototype.toString.call(message.App) : options.longs === Number ? new $util.LongBits(message.App.low >>> 0, message.App.high >>> 0).toNumber(true) : message.App;
+            return object;
+        };
+
+        /**
+         * Converts this Version to JSON.
+         * @function toJSON
+         * @memberof abci.Version
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Version.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Version;
     })();
 
     abci.BlockID = (function() {
@@ -11837,7 +12280,6 @@ $root.google = (function() {
                  * @interface IExtensionRange
                  * @property {number|null} [start] ExtensionRange start
                  * @property {number|null} [end] ExtensionRange end
-                 * @property {google.protobuf.IExtensionRangeOptions|null} [options] ExtensionRange options
                  */
 
                 /**
@@ -11872,14 +12314,6 @@ $root.google = (function() {
                 ExtensionRange.prototype.end = 0;
 
                 /**
-                 * ExtensionRange options.
-                 * @member {google.protobuf.IExtensionRangeOptions|null|undefined} options
-                 * @memberof google.protobuf.DescriptorProto.ExtensionRange
-                 * @instance
-                 */
-                ExtensionRange.prototype.options = null;
-
-                /**
                  * Creates a new ExtensionRange instance using the specified properties.
                  * @function create
                  * @memberof google.protobuf.DescriptorProto.ExtensionRange
@@ -11907,8 +12341,6 @@ $root.google = (function() {
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.start);
                     if (message.end != null && message.hasOwnProperty("end"))
                         writer.uint32(/* id 2, wireType 0 =*/16).int32(message.end);
-                    if (message.options != null && message.hasOwnProperty("options"))
-                        $root.google.protobuf.ExtensionRangeOptions.encode(message.options, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
 
@@ -11948,9 +12380,6 @@ $root.google = (function() {
                             break;
                         case 2:
                             message.end = reader.int32();
-                            break;
-                        case 3:
-                            message.options = $root.google.protobuf.ExtensionRangeOptions.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11993,11 +12422,6 @@ $root.google = (function() {
                     if (message.end != null && message.hasOwnProperty("end"))
                         if (!$util.isInteger(message.end))
                             return "end: integer expected";
-                    if (message.options != null && message.hasOwnProperty("options")) {
-                        var error = $root.google.protobuf.ExtensionRangeOptions.verify(message.options);
-                        if (error)
-                            return "options." + error;
-                    }
                     return null;
                 };
 
@@ -12017,11 +12441,6 @@ $root.google = (function() {
                         message.start = object.start | 0;
                     if (object.end != null)
                         message.end = object.end | 0;
-                    if (object.options != null) {
-                        if (typeof object.options !== "object")
-                            throw TypeError(".google.protobuf.DescriptorProto.ExtensionRange.options: object expected");
-                        message.options = $root.google.protobuf.ExtensionRangeOptions.fromObject(object.options);
-                    }
                     return message;
                 };
 
@@ -12041,14 +12460,11 @@ $root.google = (function() {
                     if (options.defaults) {
                         object.start = 0;
                         object.end = 0;
-                        object.options = null;
                     }
                     if (message.start != null && message.hasOwnProperty("start"))
                         object.start = message.start;
                     if (message.end != null && message.hasOwnProperty("end"))
                         object.end = message.end;
-                    if (message.options != null && message.hasOwnProperty("options"))
-                        object.options = $root.google.protobuf.ExtensionRangeOptions.toObject(message.options, options);
                     return object;
                 };
 
@@ -12277,214 +12693,6 @@ $root.google = (function() {
             })();
 
             return DescriptorProto;
-        })();
-
-        protobuf.ExtensionRangeOptions = (function() {
-
-            /**
-             * Properties of an ExtensionRangeOptions.
-             * @memberof google.protobuf
-             * @interface IExtensionRangeOptions
-             * @property {Array.<google.protobuf.IUninterpretedOption>|null} [uninterpretedOption] ExtensionRangeOptions uninterpretedOption
-             */
-
-            /**
-             * Constructs a new ExtensionRangeOptions.
-             * @memberof google.protobuf
-             * @classdesc Represents an ExtensionRangeOptions.
-             * @implements IExtensionRangeOptions
-             * @constructor
-             * @param {google.protobuf.IExtensionRangeOptions=} [properties] Properties to set
-             */
-            function ExtensionRangeOptions(properties) {
-                this.uninterpretedOption = [];
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * ExtensionRangeOptions uninterpretedOption.
-             * @member {Array.<google.protobuf.IUninterpretedOption>} uninterpretedOption
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @instance
-             */
-            ExtensionRangeOptions.prototype.uninterpretedOption = $util.emptyArray;
-
-            /**
-             * Creates a new ExtensionRangeOptions instance using the specified properties.
-             * @function create
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {google.protobuf.IExtensionRangeOptions=} [properties] Properties to set
-             * @returns {google.protobuf.ExtensionRangeOptions} ExtensionRangeOptions instance
-             */
-            ExtensionRangeOptions.create = function create(properties) {
-                return new ExtensionRangeOptions(properties);
-            };
-
-            /**
-             * Encodes the specified ExtensionRangeOptions message. Does not implicitly {@link google.protobuf.ExtensionRangeOptions.verify|verify} messages.
-             * @function encode
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {google.protobuf.IExtensionRangeOptions} message ExtensionRangeOptions message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            ExtensionRangeOptions.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.uninterpretedOption != null && message.uninterpretedOption.length)
-                    for (var i = 0; i < message.uninterpretedOption.length; ++i)
-                        $root.google.protobuf.UninterpretedOption.encode(message.uninterpretedOption[i], writer.uint32(/* id 999, wireType 2 =*/7994).fork()).ldelim();
-                return writer;
-            };
-
-            /**
-             * Encodes the specified ExtensionRangeOptions message, length delimited. Does not implicitly {@link google.protobuf.ExtensionRangeOptions.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {google.protobuf.IExtensionRangeOptions} message ExtensionRangeOptions message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            ExtensionRangeOptions.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes an ExtensionRangeOptions message from the specified reader or buffer.
-             * @function decode
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {google.protobuf.ExtensionRangeOptions} ExtensionRangeOptions
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            ExtensionRangeOptions.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.ExtensionRangeOptions();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 999:
-                        if (!(message.uninterpretedOption && message.uninterpretedOption.length))
-                            message.uninterpretedOption = [];
-                        message.uninterpretedOption.push($root.google.protobuf.UninterpretedOption.decode(reader, reader.uint32()));
-                        break;
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes an ExtensionRangeOptions message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {google.protobuf.ExtensionRangeOptions} ExtensionRangeOptions
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            ExtensionRangeOptions.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies an ExtensionRangeOptions message.
-             * @function verify
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            ExtensionRangeOptions.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.uninterpretedOption != null && message.hasOwnProperty("uninterpretedOption")) {
-                    if (!Array.isArray(message.uninterpretedOption))
-                        return "uninterpretedOption: array expected";
-                    for (var i = 0; i < message.uninterpretedOption.length; ++i) {
-                        var error = $root.google.protobuf.UninterpretedOption.verify(message.uninterpretedOption[i]);
-                        if (error)
-                            return "uninterpretedOption." + error;
-                    }
-                }
-                return null;
-            };
-
-            /**
-             * Creates an ExtensionRangeOptions message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {google.protobuf.ExtensionRangeOptions} ExtensionRangeOptions
-             */
-            ExtensionRangeOptions.fromObject = function fromObject(object) {
-                if (object instanceof $root.google.protobuf.ExtensionRangeOptions)
-                    return object;
-                var message = new $root.google.protobuf.ExtensionRangeOptions();
-                if (object.uninterpretedOption) {
-                    if (!Array.isArray(object.uninterpretedOption))
-                        throw TypeError(".google.protobuf.ExtensionRangeOptions.uninterpretedOption: array expected");
-                    message.uninterpretedOption = [];
-                    for (var i = 0; i < object.uninterpretedOption.length; ++i) {
-                        if (typeof object.uninterpretedOption[i] !== "object")
-                            throw TypeError(".google.protobuf.ExtensionRangeOptions.uninterpretedOption: object expected");
-                        message.uninterpretedOption[i] = $root.google.protobuf.UninterpretedOption.fromObject(object.uninterpretedOption[i]);
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Creates a plain object from an ExtensionRangeOptions message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @static
-             * @param {google.protobuf.ExtensionRangeOptions} message ExtensionRangeOptions
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            ExtensionRangeOptions.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.arrays || options.defaults)
-                    object.uninterpretedOption = [];
-                if (message.uninterpretedOption && message.uninterpretedOption.length) {
-                    object.uninterpretedOption = [];
-                    for (var j = 0; j < message.uninterpretedOption.length; ++j)
-                        object.uninterpretedOption[j] = $root.google.protobuf.UninterpretedOption.toObject(message.uninterpretedOption[j], options);
-                }
-                return object;
-            };
-
-            /**
-             * Converts this ExtensionRangeOptions to JSON.
-             * @function toJSON
-             * @memberof google.protobuf.ExtensionRangeOptions
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            ExtensionRangeOptions.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            return ExtensionRangeOptions;
         })();
 
         protobuf.FieldDescriptorProto = (function() {
@@ -13275,8 +13483,6 @@ $root.google = (function() {
              * @property {string|null} [name] EnumDescriptorProto name
              * @property {Array.<google.protobuf.IEnumValueDescriptorProto>|null} [value] EnumDescriptorProto value
              * @property {google.protobuf.IEnumOptions|null} [options] EnumDescriptorProto options
-             * @property {Array.<google.protobuf.EnumDescriptorProto.IEnumReservedRange>|null} [reservedRange] EnumDescriptorProto reservedRange
-             * @property {Array.<string>|null} [reservedName] EnumDescriptorProto reservedName
              */
 
             /**
@@ -13289,8 +13495,6 @@ $root.google = (function() {
              */
             function EnumDescriptorProto(properties) {
                 this.value = [];
-                this.reservedRange = [];
-                this.reservedName = [];
                 if (properties)
                     for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
@@ -13320,22 +13524,6 @@ $root.google = (function() {
              * @instance
              */
             EnumDescriptorProto.prototype.options = null;
-
-            /**
-             * EnumDescriptorProto reservedRange.
-             * @member {Array.<google.protobuf.EnumDescriptorProto.IEnumReservedRange>} reservedRange
-             * @memberof google.protobuf.EnumDescriptorProto
-             * @instance
-             */
-            EnumDescriptorProto.prototype.reservedRange = $util.emptyArray;
-
-            /**
-             * EnumDescriptorProto reservedName.
-             * @member {Array.<string>} reservedName
-             * @memberof google.protobuf.EnumDescriptorProto
-             * @instance
-             */
-            EnumDescriptorProto.prototype.reservedName = $util.emptyArray;
 
             /**
              * Creates a new EnumDescriptorProto instance using the specified properties.
@@ -13368,12 +13556,6 @@ $root.google = (function() {
                         $root.google.protobuf.EnumValueDescriptorProto.encode(message.value[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 if (message.options != null && message.hasOwnProperty("options"))
                     $root.google.protobuf.EnumOptions.encode(message.options, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                if (message.reservedRange != null && message.reservedRange.length)
-                    for (var i = 0; i < message.reservedRange.length; ++i)
-                        $root.google.protobuf.EnumDescriptorProto.EnumReservedRange.encode(message.reservedRange[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                if (message.reservedName != null && message.reservedName.length)
-                    for (var i = 0; i < message.reservedName.length; ++i)
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.reservedName[i]);
                 return writer;
             };
 
@@ -13418,16 +13600,6 @@ $root.google = (function() {
                         break;
                     case 3:
                         message.options = $root.google.protobuf.EnumOptions.decode(reader, reader.uint32());
-                        break;
-                    case 4:
-                        if (!(message.reservedRange && message.reservedRange.length))
-                            message.reservedRange = [];
-                        message.reservedRange.push($root.google.protobuf.EnumDescriptorProto.EnumReservedRange.decode(reader, reader.uint32()));
-                        break;
-                    case 5:
-                        if (!(message.reservedName && message.reservedName.length))
-                            message.reservedName = [];
-                        message.reservedName.push(reader.string());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -13481,22 +13653,6 @@ $root.google = (function() {
                     if (error)
                         return "options." + error;
                 }
-                if (message.reservedRange != null && message.hasOwnProperty("reservedRange")) {
-                    if (!Array.isArray(message.reservedRange))
-                        return "reservedRange: array expected";
-                    for (var i = 0; i < message.reservedRange.length; ++i) {
-                        var error = $root.google.protobuf.EnumDescriptorProto.EnumReservedRange.verify(message.reservedRange[i]);
-                        if (error)
-                            return "reservedRange." + error;
-                    }
-                }
-                if (message.reservedName != null && message.hasOwnProperty("reservedName")) {
-                    if (!Array.isArray(message.reservedName))
-                        return "reservedName: array expected";
-                    for (var i = 0; i < message.reservedName.length; ++i)
-                        if (!$util.isString(message.reservedName[i]))
-                            return "reservedName: string[] expected";
-                }
                 return null;
             };
 
@@ -13529,23 +13685,6 @@ $root.google = (function() {
                         throw TypeError(".google.protobuf.EnumDescriptorProto.options: object expected");
                     message.options = $root.google.protobuf.EnumOptions.fromObject(object.options);
                 }
-                if (object.reservedRange) {
-                    if (!Array.isArray(object.reservedRange))
-                        throw TypeError(".google.protobuf.EnumDescriptorProto.reservedRange: array expected");
-                    message.reservedRange = [];
-                    for (var i = 0; i < object.reservedRange.length; ++i) {
-                        if (typeof object.reservedRange[i] !== "object")
-                            throw TypeError(".google.protobuf.EnumDescriptorProto.reservedRange: object expected");
-                        message.reservedRange[i] = $root.google.protobuf.EnumDescriptorProto.EnumReservedRange.fromObject(object.reservedRange[i]);
-                    }
-                }
-                if (object.reservedName) {
-                    if (!Array.isArray(object.reservedName))
-                        throw TypeError(".google.protobuf.EnumDescriptorProto.reservedName: array expected");
-                    message.reservedName = [];
-                    for (var i = 0; i < object.reservedName.length; ++i)
-                        message.reservedName[i] = String(object.reservedName[i]);
-                }
                 return message;
             };
 
@@ -13562,11 +13701,8 @@ $root.google = (function() {
                 if (!options)
                     options = {};
                 var object = {};
-                if (options.arrays || options.defaults) {
+                if (options.arrays || options.defaults)
                     object.value = [];
-                    object.reservedRange = [];
-                    object.reservedName = [];
-                }
                 if (options.defaults) {
                     object.name = "";
                     object.options = null;
@@ -13580,16 +13716,6 @@ $root.google = (function() {
                 }
                 if (message.options != null && message.hasOwnProperty("options"))
                     object.options = $root.google.protobuf.EnumOptions.toObject(message.options, options);
-                if (message.reservedRange && message.reservedRange.length) {
-                    object.reservedRange = [];
-                    for (var j = 0; j < message.reservedRange.length; ++j)
-                        object.reservedRange[j] = $root.google.protobuf.EnumDescriptorProto.EnumReservedRange.toObject(message.reservedRange[j], options);
-                }
-                if (message.reservedName && message.reservedName.length) {
-                    object.reservedName = [];
-                    for (var j = 0; j < message.reservedName.length; ++j)
-                        object.reservedName[j] = message.reservedName[j];
-                }
                 return object;
             };
 
@@ -13603,216 +13729,6 @@ $root.google = (function() {
             EnumDescriptorProto.prototype.toJSON = function toJSON() {
                 return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
             };
-
-            EnumDescriptorProto.EnumReservedRange = (function() {
-
-                /**
-                 * Properties of an EnumReservedRange.
-                 * @memberof google.protobuf.EnumDescriptorProto
-                 * @interface IEnumReservedRange
-                 * @property {number|null} [start] EnumReservedRange start
-                 * @property {number|null} [end] EnumReservedRange end
-                 */
-
-                /**
-                 * Constructs a new EnumReservedRange.
-                 * @memberof google.protobuf.EnumDescriptorProto
-                 * @classdesc Represents an EnumReservedRange.
-                 * @implements IEnumReservedRange
-                 * @constructor
-                 * @param {google.protobuf.EnumDescriptorProto.IEnumReservedRange=} [properties] Properties to set
-                 */
-                function EnumReservedRange(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-
-                /**
-                 * EnumReservedRange start.
-                 * @member {number} start
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @instance
-                 */
-                EnumReservedRange.prototype.start = 0;
-
-                /**
-                 * EnumReservedRange end.
-                 * @member {number} end
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @instance
-                 */
-                EnumReservedRange.prototype.end = 0;
-
-                /**
-                 * Creates a new EnumReservedRange instance using the specified properties.
-                 * @function create
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {google.protobuf.EnumDescriptorProto.IEnumReservedRange=} [properties] Properties to set
-                 * @returns {google.protobuf.EnumDescriptorProto.EnumReservedRange} EnumReservedRange instance
-                 */
-                EnumReservedRange.create = function create(properties) {
-                    return new EnumReservedRange(properties);
-                };
-
-                /**
-                 * Encodes the specified EnumReservedRange message. Does not implicitly {@link google.protobuf.EnumDescriptorProto.EnumReservedRange.verify|verify} messages.
-                 * @function encode
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {google.protobuf.EnumDescriptorProto.IEnumReservedRange} message EnumReservedRange message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                EnumReservedRange.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.start != null && message.hasOwnProperty("start"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.start);
-                    if (message.end != null && message.hasOwnProperty("end"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.end);
-                    return writer;
-                };
-
-                /**
-                 * Encodes the specified EnumReservedRange message, length delimited. Does not implicitly {@link google.protobuf.EnumDescriptorProto.EnumReservedRange.verify|verify} messages.
-                 * @function encodeDelimited
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {google.protobuf.EnumDescriptorProto.IEnumReservedRange} message EnumReservedRange message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                EnumReservedRange.encodeDelimited = function encodeDelimited(message, writer) {
-                    return this.encode(message, writer).ldelim();
-                };
-
-                /**
-                 * Decodes an EnumReservedRange message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {google.protobuf.EnumDescriptorProto.EnumReservedRange} EnumReservedRange
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                EnumReservedRange.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.EnumDescriptorProto.EnumReservedRange();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.start = reader.int32();
-                            break;
-                        case 2:
-                            message.end = reader.int32();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-
-                /**
-                 * Decodes an EnumReservedRange message from the specified reader or buffer, length delimited.
-                 * @function decodeDelimited
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @returns {google.protobuf.EnumDescriptorProto.EnumReservedRange} EnumReservedRange
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                EnumReservedRange.decodeDelimited = function decodeDelimited(reader) {
-                    if (!(reader instanceof $Reader))
-                        reader = new $Reader(reader);
-                    return this.decode(reader, reader.uint32());
-                };
-
-                /**
-                 * Verifies an EnumReservedRange message.
-                 * @function verify
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                EnumReservedRange.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.start != null && message.hasOwnProperty("start"))
-                        if (!$util.isInteger(message.start))
-                            return "start: integer expected";
-                    if (message.end != null && message.hasOwnProperty("end"))
-                        if (!$util.isInteger(message.end))
-                            return "end: integer expected";
-                    return null;
-                };
-
-                /**
-                 * Creates an EnumReservedRange message from a plain object. Also converts values to their respective internal types.
-                 * @function fromObject
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {Object.<string,*>} object Plain object
-                 * @returns {google.protobuf.EnumDescriptorProto.EnumReservedRange} EnumReservedRange
-                 */
-                EnumReservedRange.fromObject = function fromObject(object) {
-                    if (object instanceof $root.google.protobuf.EnumDescriptorProto.EnumReservedRange)
-                        return object;
-                    var message = new $root.google.protobuf.EnumDescriptorProto.EnumReservedRange();
-                    if (object.start != null)
-                        message.start = object.start | 0;
-                    if (object.end != null)
-                        message.end = object.end | 0;
-                    return message;
-                };
-
-                /**
-                 * Creates a plain object from an EnumReservedRange message. Also converts values to other types if specified.
-                 * @function toObject
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @static
-                 * @param {google.protobuf.EnumDescriptorProto.EnumReservedRange} message EnumReservedRange
-                 * @param {$protobuf.IConversionOptions} [options] Conversion options
-                 * @returns {Object.<string,*>} Plain object
-                 */
-                EnumReservedRange.toObject = function toObject(message, options) {
-                    if (!options)
-                        options = {};
-                    var object = {};
-                    if (options.defaults) {
-                        object.start = 0;
-                        object.end = 0;
-                    }
-                    if (message.start != null && message.hasOwnProperty("start"))
-                        object.start = message.start;
-                    if (message.end != null && message.hasOwnProperty("end"))
-                        object.end = message.end;
-                    return object;
-                };
-
-                /**
-                 * Converts this EnumReservedRange to JSON.
-                 * @function toJSON
-                 * @memberof google.protobuf.EnumDescriptorProto.EnumReservedRange
-                 * @instance
-                 * @returns {Object.<string,*>} JSON object
-                 */
-                EnumReservedRange.prototype.toJSON = function toJSON() {
-                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-                };
-
-                return EnumReservedRange;
-            })();
 
             return EnumDescriptorProto;
         })();
@@ -14632,14 +14548,10 @@ $root.google = (function() {
              * @property {boolean|null} [ccGenericServices] FileOptions ccGenericServices
              * @property {boolean|null} [javaGenericServices] FileOptions javaGenericServices
              * @property {boolean|null} [pyGenericServices] FileOptions pyGenericServices
-             * @property {boolean|null} [phpGenericServices] FileOptions phpGenericServices
              * @property {boolean|null} [deprecated] FileOptions deprecated
              * @property {boolean|null} [ccEnableArenas] FileOptions ccEnableArenas
              * @property {string|null} [objcClassPrefix] FileOptions objcClassPrefix
              * @property {string|null} [csharpNamespace] FileOptions csharpNamespace
-             * @property {string|null} [swiftPrefix] FileOptions swiftPrefix
-             * @property {string|null} [phpClassPrefix] FileOptions phpClassPrefix
-             * @property {string|null} [phpNamespace] FileOptions phpNamespace
              * @property {Array.<google.protobuf.IUninterpretedOption>|null} [uninterpretedOption] FileOptions uninterpretedOption
              * @property {boolean|null} [".gogoproto.goprotoGettersAll"] FileOptions .gogoproto.goprotoGettersAll
              * @property {boolean|null} [".gogoproto.goprotoEnumPrefixAll"] FileOptions .gogoproto.goprotoEnumPrefixAll
@@ -14671,6 +14583,8 @@ $root.google = (function() {
              * @property {boolean|null} [".gogoproto.enumdeclAll"] FileOptions .gogoproto.enumdeclAll
              * @property {boolean|null} [".gogoproto.goprotoRegistration"] FileOptions .gogoproto.goprotoRegistration
              * @property {boolean|null} [".gogoproto.messagenameAll"] FileOptions .gogoproto.messagenameAll
+             * @property {boolean|null} [".gogoproto.goprotoSizecacheAll"] FileOptions .gogoproto.goprotoSizecacheAll
+             * @property {boolean|null} [".gogoproto.goprotoUnkeyedAll"] FileOptions .gogoproto.goprotoUnkeyedAll
              */
 
             /**
@@ -14770,14 +14684,6 @@ $root.google = (function() {
             FileOptions.prototype.pyGenericServices = false;
 
             /**
-             * FileOptions phpGenericServices.
-             * @member {boolean} phpGenericServices
-             * @memberof google.protobuf.FileOptions
-             * @instance
-             */
-            FileOptions.prototype.phpGenericServices = false;
-
-            /**
              * FileOptions deprecated.
              * @member {boolean} deprecated
              * @memberof google.protobuf.FileOptions
@@ -14808,30 +14714,6 @@ $root.google = (function() {
              * @instance
              */
             FileOptions.prototype.csharpNamespace = "";
-
-            /**
-             * FileOptions swiftPrefix.
-             * @member {string} swiftPrefix
-             * @memberof google.protobuf.FileOptions
-             * @instance
-             */
-            FileOptions.prototype.swiftPrefix = "";
-
-            /**
-             * FileOptions phpClassPrefix.
-             * @member {string} phpClassPrefix
-             * @memberof google.protobuf.FileOptions
-             * @instance
-             */
-            FileOptions.prototype.phpClassPrefix = "";
-
-            /**
-             * FileOptions phpNamespace.
-             * @member {string} phpNamespace
-             * @memberof google.protobuf.FileOptions
-             * @instance
-             */
-            FileOptions.prototype.phpNamespace = "";
 
             /**
              * FileOptions uninterpretedOption.
@@ -15082,6 +14964,22 @@ $root.google = (function() {
             FileOptions.prototype[".gogoproto.messagenameAll"] = false;
 
             /**
+             * FileOptions .gogoproto.goprotoSizecacheAll.
+             * @member {boolean} .gogoproto.goprotoSizecacheAll
+             * @memberof google.protobuf.FileOptions
+             * @instance
+             */
+            FileOptions.prototype[".gogoproto.goprotoSizecacheAll"] = false;
+
+            /**
+             * FileOptions .gogoproto.goprotoUnkeyedAll.
+             * @member {boolean} .gogoproto.goprotoUnkeyedAll
+             * @memberof google.protobuf.FileOptions
+             * @instance
+             */
+            FileOptions.prototype[".gogoproto.goprotoUnkeyedAll"] = false;
+
+            /**
              * Creates a new FileOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.FileOptions
@@ -15133,14 +15031,6 @@ $root.google = (function() {
                     writer.uint32(/* id 36, wireType 2 =*/290).string(message.objcClassPrefix);
                 if (message.csharpNamespace != null && message.hasOwnProperty("csharpNamespace"))
                     writer.uint32(/* id 37, wireType 2 =*/298).string(message.csharpNamespace);
-                if (message.swiftPrefix != null && message.hasOwnProperty("swiftPrefix"))
-                    writer.uint32(/* id 39, wireType 2 =*/314).string(message.swiftPrefix);
-                if (message.phpClassPrefix != null && message.hasOwnProperty("phpClassPrefix"))
-                    writer.uint32(/* id 40, wireType 2 =*/322).string(message.phpClassPrefix);
-                if (message.phpNamespace != null && message.hasOwnProperty("phpNamespace"))
-                    writer.uint32(/* id 41, wireType 2 =*/330).string(message.phpNamespace);
-                if (message.phpGenericServices != null && message.hasOwnProperty("phpGenericServices"))
-                    writer.uint32(/* id 42, wireType 0 =*/336).bool(message.phpGenericServices);
                 if (message.uninterpretedOption != null && message.uninterpretedOption.length)
                     for (var i = 0; i < message.uninterpretedOption.length; ++i)
                         $root.google.protobuf.UninterpretedOption.encode(message.uninterpretedOption[i], writer.uint32(/* id 999, wireType 2 =*/7994).fork()).ldelim();
@@ -15204,6 +15094,10 @@ $root.google = (function() {
                     writer.uint32(/* id 63032, wireType 0 =*/504256).bool(message[".gogoproto.goprotoRegistration"]);
                 if (message[".gogoproto.messagenameAll"] != null && message.hasOwnProperty(".gogoproto.messagenameAll"))
                     writer.uint32(/* id 63033, wireType 0 =*/504264).bool(message[".gogoproto.messagenameAll"]);
+                if (message[".gogoproto.goprotoSizecacheAll"] != null && message.hasOwnProperty(".gogoproto.goprotoSizecacheAll"))
+                    writer.uint32(/* id 63034, wireType 0 =*/504272).bool(message[".gogoproto.goprotoSizecacheAll"]);
+                if (message[".gogoproto.goprotoUnkeyedAll"] != null && message.hasOwnProperty(".gogoproto.goprotoUnkeyedAll"))
+                    writer.uint32(/* id 63035, wireType 0 =*/504280).bool(message[".gogoproto.goprotoUnkeyedAll"]);
                 return writer;
             };
 
@@ -15268,9 +15162,6 @@ $root.google = (function() {
                     case 18:
                         message.pyGenericServices = reader.bool();
                         break;
-                    case 42:
-                        message.phpGenericServices = reader.bool();
-                        break;
                     case 23:
                         message.deprecated = reader.bool();
                         break;
@@ -15282,15 +15173,6 @@ $root.google = (function() {
                         break;
                     case 37:
                         message.csharpNamespace = reader.string();
-                        break;
-                    case 39:
-                        message.swiftPrefix = reader.string();
-                        break;
-                    case 40:
-                        message.phpClassPrefix = reader.string();
-                        break;
-                    case 41:
-                        message.phpNamespace = reader.string();
                         break;
                     case 999:
                         if (!(message.uninterpretedOption && message.uninterpretedOption.length))
@@ -15387,6 +15269,12 @@ $root.google = (function() {
                     case 63033:
                         message[".gogoproto.messagenameAll"] = reader.bool();
                         break;
+                    case 63034:
+                        message[".gogoproto.goprotoSizecacheAll"] = reader.bool();
+                        break;
+                    case 63035:
+                        message[".gogoproto.goprotoUnkeyedAll"] = reader.bool();
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -15458,9 +15346,6 @@ $root.google = (function() {
                 if (message.pyGenericServices != null && message.hasOwnProperty("pyGenericServices"))
                     if (typeof message.pyGenericServices !== "boolean")
                         return "pyGenericServices: boolean expected";
-                if (message.phpGenericServices != null && message.hasOwnProperty("phpGenericServices"))
-                    if (typeof message.phpGenericServices !== "boolean")
-                        return "phpGenericServices: boolean expected";
                 if (message.deprecated != null && message.hasOwnProperty("deprecated"))
                     if (typeof message.deprecated !== "boolean")
                         return "deprecated: boolean expected";
@@ -15473,15 +15358,6 @@ $root.google = (function() {
                 if (message.csharpNamespace != null && message.hasOwnProperty("csharpNamespace"))
                     if (!$util.isString(message.csharpNamespace))
                         return "csharpNamespace: string expected";
-                if (message.swiftPrefix != null && message.hasOwnProperty("swiftPrefix"))
-                    if (!$util.isString(message.swiftPrefix))
-                        return "swiftPrefix: string expected";
-                if (message.phpClassPrefix != null && message.hasOwnProperty("phpClassPrefix"))
-                    if (!$util.isString(message.phpClassPrefix))
-                        return "phpClassPrefix: string expected";
-                if (message.phpNamespace != null && message.hasOwnProperty("phpNamespace"))
-                    if (!$util.isString(message.phpNamespace))
-                        return "phpNamespace: string expected";
                 if (message.uninterpretedOption != null && message.hasOwnProperty("uninterpretedOption")) {
                     if (!Array.isArray(message.uninterpretedOption))
                         return "uninterpretedOption: array expected";
@@ -15581,6 +15457,12 @@ $root.google = (function() {
                 if (message[".gogoproto.messagenameAll"] != null && message.hasOwnProperty(".gogoproto.messagenameAll"))
                     if (typeof message[".gogoproto.messagenameAll"] !== "boolean")
                         return ".gogoproto.messagenameAll: boolean expected";
+                if (message[".gogoproto.goprotoSizecacheAll"] != null && message.hasOwnProperty(".gogoproto.goprotoSizecacheAll"))
+                    if (typeof message[".gogoproto.goprotoSizecacheAll"] !== "boolean")
+                        return ".gogoproto.goprotoSizecacheAll: boolean expected";
+                if (message[".gogoproto.goprotoUnkeyedAll"] != null && message.hasOwnProperty(".gogoproto.goprotoUnkeyedAll"))
+                    if (typeof message[".gogoproto.goprotoUnkeyedAll"] !== "boolean")
+                        return ".gogoproto.goprotoUnkeyedAll: boolean expected";
                 return null;
             };
 
@@ -15628,8 +15510,6 @@ $root.google = (function() {
                     message.javaGenericServices = Boolean(object.javaGenericServices);
                 if (object.pyGenericServices != null)
                     message.pyGenericServices = Boolean(object.pyGenericServices);
-                if (object.phpGenericServices != null)
-                    message.phpGenericServices = Boolean(object.phpGenericServices);
                 if (object.deprecated != null)
                     message.deprecated = Boolean(object.deprecated);
                 if (object.ccEnableArenas != null)
@@ -15638,12 +15518,6 @@ $root.google = (function() {
                     message.objcClassPrefix = String(object.objcClassPrefix);
                 if (object.csharpNamespace != null)
                     message.csharpNamespace = String(object.csharpNamespace);
-                if (object.swiftPrefix != null)
-                    message.swiftPrefix = String(object.swiftPrefix);
-                if (object.phpClassPrefix != null)
-                    message.phpClassPrefix = String(object.phpClassPrefix);
-                if (object.phpNamespace != null)
-                    message.phpNamespace = String(object.phpNamespace);
                 if (object.uninterpretedOption) {
                     if (!Array.isArray(object.uninterpretedOption))
                         throw TypeError(".google.protobuf.FileOptions.uninterpretedOption: array expected");
@@ -15714,6 +15588,10 @@ $root.google = (function() {
                     message[".gogoproto.goprotoRegistration"] = Boolean(object[".gogoproto.goprotoRegistration"]);
                 if (object[".gogoproto.messagenameAll"] != null)
                     message[".gogoproto.messagenameAll"] = Boolean(object[".gogoproto.messagenameAll"]);
+                if (object[".gogoproto.goprotoSizecacheAll"] != null)
+                    message[".gogoproto.goprotoSizecacheAll"] = Boolean(object[".gogoproto.goprotoSizecacheAll"]);
+                if (object[".gogoproto.goprotoUnkeyedAll"] != null)
+                    message[".gogoproto.goprotoUnkeyedAll"] = Boolean(object[".gogoproto.goprotoUnkeyedAll"]);
                 return message;
             };
 
@@ -15747,10 +15625,6 @@ $root.google = (function() {
                     object.ccEnableArenas = false;
                     object.objcClassPrefix = "";
                     object.csharpNamespace = "";
-                    object.swiftPrefix = "";
-                    object.phpClassPrefix = "";
-                    object.phpNamespace = "";
-                    object.phpGenericServices = false;
                     object[".gogoproto.goprotoGettersAll"] = false;
                     object[".gogoproto.goprotoEnumPrefixAll"] = false;
                     object[".gogoproto.goprotoStringerAll"] = false;
@@ -15781,6 +15655,8 @@ $root.google = (function() {
                     object[".gogoproto.enumdeclAll"] = false;
                     object[".gogoproto.goprotoRegistration"] = false;
                     object[".gogoproto.messagenameAll"] = false;
+                    object[".gogoproto.goprotoSizecacheAll"] = false;
+                    object[".gogoproto.goprotoUnkeyedAll"] = false;
                 }
                 if (message.javaPackage != null && message.hasOwnProperty("javaPackage"))
                     object.javaPackage = message.javaPackage;
@@ -15810,14 +15686,6 @@ $root.google = (function() {
                     object.objcClassPrefix = message.objcClassPrefix;
                 if (message.csharpNamespace != null && message.hasOwnProperty("csharpNamespace"))
                     object.csharpNamespace = message.csharpNamespace;
-                if (message.swiftPrefix != null && message.hasOwnProperty("swiftPrefix"))
-                    object.swiftPrefix = message.swiftPrefix;
-                if (message.phpClassPrefix != null && message.hasOwnProperty("phpClassPrefix"))
-                    object.phpClassPrefix = message.phpClassPrefix;
-                if (message.phpNamespace != null && message.hasOwnProperty("phpNamespace"))
-                    object.phpNamespace = message.phpNamespace;
-                if (message.phpGenericServices != null && message.hasOwnProperty("phpGenericServices"))
-                    object.phpGenericServices = message.phpGenericServices;
                 if (message.uninterpretedOption && message.uninterpretedOption.length) {
                     object.uninterpretedOption = [];
                     for (var j = 0; j < message.uninterpretedOption.length; ++j)
@@ -15883,6 +15751,10 @@ $root.google = (function() {
                     object[".gogoproto.goprotoRegistration"] = message[".gogoproto.goprotoRegistration"];
                 if (message[".gogoproto.messagenameAll"] != null && message.hasOwnProperty(".gogoproto.messagenameAll"))
                     object[".gogoproto.messagenameAll"] = message[".gogoproto.messagenameAll"];
+                if (message[".gogoproto.goprotoSizecacheAll"] != null && message.hasOwnProperty(".gogoproto.goprotoSizecacheAll"))
+                    object[".gogoproto.goprotoSizecacheAll"] = message[".gogoproto.goprotoSizecacheAll"];
+                if (message[".gogoproto.goprotoUnkeyedAll"] != null && message.hasOwnProperty(".gogoproto.goprotoUnkeyedAll"))
+                    object[".gogoproto.goprotoUnkeyedAll"] = message[".gogoproto.goprotoUnkeyedAll"];
                 return object;
             };
 
@@ -15951,6 +15823,8 @@ $root.google = (function() {
              * @property {boolean|null} [".gogoproto.compare"] MessageOptions .gogoproto.compare
              * @property {boolean|null} [".gogoproto.typedecl"] MessageOptions .gogoproto.typedecl
              * @property {boolean|null} [".gogoproto.messagename"] MessageOptions .gogoproto.messagename
+             * @property {boolean|null} [".gogoproto.goprotoSizecache"] MessageOptions .gogoproto.goprotoSizecache
+             * @property {boolean|null} [".gogoproto.goprotoUnkeyed"] MessageOptions .gogoproto.goprotoUnkeyed
              */
 
             /**
@@ -16202,6 +16076,22 @@ $root.google = (function() {
             MessageOptions.prototype[".gogoproto.messagename"] = false;
 
             /**
+             * MessageOptions .gogoproto.goprotoSizecache.
+             * @member {boolean} .gogoproto.goprotoSizecache
+             * @memberof google.protobuf.MessageOptions
+             * @instance
+             */
+            MessageOptions.prototype[".gogoproto.goprotoSizecache"] = false;
+
+            /**
+             * MessageOptions .gogoproto.goprotoUnkeyed.
+             * @member {boolean} .gogoproto.goprotoUnkeyed
+             * @memberof google.protobuf.MessageOptions
+             * @instance
+             */
+            MessageOptions.prototype[".gogoproto.goprotoUnkeyed"] = false;
+
+            /**
              * Creates a new MessageOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.MessageOptions
@@ -16282,6 +16172,10 @@ $root.google = (function() {
                     writer.uint32(/* id 64030, wireType 0 =*/512240).bool(message[".gogoproto.typedecl"]);
                 if (message[".gogoproto.messagename"] != null && message.hasOwnProperty(".gogoproto.messagename"))
                     writer.uint32(/* id 64033, wireType 0 =*/512264).bool(message[".gogoproto.messagename"]);
+                if (message[".gogoproto.goprotoSizecache"] != null && message.hasOwnProperty(".gogoproto.goprotoSizecache"))
+                    writer.uint32(/* id 64034, wireType 0 =*/512272).bool(message[".gogoproto.goprotoSizecache"]);
+                if (message[".gogoproto.goprotoUnkeyed"] != null && message.hasOwnProperty(".gogoproto.goprotoUnkeyed"))
+                    writer.uint32(/* id 64035, wireType 0 =*/512280).bool(message[".gogoproto.goprotoUnkeyed"]);
                 if (message[".gogoproto.stringer"] != null && message.hasOwnProperty(".gogoproto.stringer"))
                     writer.uint32(/* id 67008, wireType 0 =*/536064).bool(message[".gogoproto.stringer"]);
                 return writer;
@@ -16406,6 +16300,12 @@ $root.google = (function() {
                         break;
                     case 64033:
                         message[".gogoproto.messagename"] = reader.bool();
+                        break;
+                    case 64034:
+                        message[".gogoproto.goprotoSizecache"] = reader.bool();
+                        break;
+                    case 64035:
+                        message[".gogoproto.goprotoUnkeyed"] = reader.bool();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -16535,6 +16435,12 @@ $root.google = (function() {
                 if (message[".gogoproto.messagename"] != null && message.hasOwnProperty(".gogoproto.messagename"))
                     if (typeof message[".gogoproto.messagename"] !== "boolean")
                         return ".gogoproto.messagename: boolean expected";
+                if (message[".gogoproto.goprotoSizecache"] != null && message.hasOwnProperty(".gogoproto.goprotoSizecache"))
+                    if (typeof message[".gogoproto.goprotoSizecache"] !== "boolean")
+                        return ".gogoproto.goprotoSizecache: boolean expected";
+                if (message[".gogoproto.goprotoUnkeyed"] != null && message.hasOwnProperty(".gogoproto.goprotoUnkeyed"))
+                    if (typeof message[".gogoproto.goprotoUnkeyed"] !== "boolean")
+                        return ".gogoproto.goprotoUnkeyed: boolean expected";
                 return null;
             };
 
@@ -16616,6 +16522,10 @@ $root.google = (function() {
                     message[".gogoproto.typedecl"] = Boolean(object[".gogoproto.typedecl"]);
                 if (object[".gogoproto.messagename"] != null)
                     message[".gogoproto.messagename"] = Boolean(object[".gogoproto.messagename"]);
+                if (object[".gogoproto.goprotoSizecache"] != null)
+                    message[".gogoproto.goprotoSizecache"] = Boolean(object[".gogoproto.goprotoSizecache"]);
+                if (object[".gogoproto.goprotoUnkeyed"] != null)
+                    message[".gogoproto.goprotoUnkeyed"] = Boolean(object[".gogoproto.goprotoUnkeyed"]);
                 return message;
             };
 
@@ -16662,6 +16572,8 @@ $root.google = (function() {
                     object[".gogoproto.compare"] = false;
                     object[".gogoproto.typedecl"] = false;
                     object[".gogoproto.messagename"] = false;
+                    object[".gogoproto.goprotoSizecache"] = false;
+                    object[".gogoproto.goprotoUnkeyed"] = false;
                     object[".gogoproto.stringer"] = false;
                 }
                 if (message.messageSetWireFormat != null && message.hasOwnProperty("messageSetWireFormat"))
@@ -16723,6 +16635,10 @@ $root.google = (function() {
                     object[".gogoproto.typedecl"] = message[".gogoproto.typedecl"];
                 if (message[".gogoproto.messagename"] != null && message.hasOwnProperty(".gogoproto.messagename"))
                     object[".gogoproto.messagename"] = message[".gogoproto.messagename"];
+                if (message[".gogoproto.goprotoSizecache"] != null && message.hasOwnProperty(".gogoproto.goprotoSizecache"))
+                    object[".gogoproto.goprotoSizecache"] = message[".gogoproto.goprotoSizecache"];
+                if (message[".gogoproto.goprotoUnkeyed"] != null && message.hasOwnProperty(".gogoproto.goprotoUnkeyed"))
+                    object[".gogoproto.goprotoUnkeyed"] = message[".gogoproto.goprotoUnkeyed"];
                 if (message[".gogoproto.stringer"] != null && message.hasOwnProperty(".gogoproto.stringer"))
                     object[".gogoproto.stringer"] = message[".gogoproto.stringer"];
                 return object;
@@ -16766,6 +16682,7 @@ $root.google = (function() {
              * @property {string|null} [".gogoproto.castvalue"] FieldOptions .gogoproto.castvalue
              * @property {boolean|null} [".gogoproto.stdtime"] FieldOptions .gogoproto.stdtime
              * @property {boolean|null} [".gogoproto.stdduration"] FieldOptions .gogoproto.stdduration
+             * @property {boolean|null} [".gogoproto.wktpointer"] FieldOptions .gogoproto.wktpointer
              */
 
             /**
@@ -16929,6 +16846,14 @@ $root.google = (function() {
             FieldOptions.prototype[".gogoproto.stdduration"] = false;
 
             /**
+             * FieldOptions .gogoproto.wktpointer.
+             * @member {boolean} .gogoproto.wktpointer
+             * @memberof google.protobuf.FieldOptions
+             * @instance
+             */
+            FieldOptions.prototype[".gogoproto.wktpointer"] = false;
+
+            /**
              * Creates a new FieldOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.FieldOptions
@@ -16989,6 +16914,8 @@ $root.google = (function() {
                     writer.uint32(/* id 65010, wireType 0 =*/520080).bool(message[".gogoproto.stdtime"]);
                 if (message[".gogoproto.stdduration"] != null && message.hasOwnProperty(".gogoproto.stdduration"))
                     writer.uint32(/* id 65011, wireType 0 =*/520088).bool(message[".gogoproto.stdduration"]);
+                if (message[".gogoproto.wktpointer"] != null && message.hasOwnProperty(".gogoproto.wktpointer"))
+                    writer.uint32(/* id 65012, wireType 0 =*/520096).bool(message[".gogoproto.wktpointer"]);
                 return writer;
             };
 
@@ -17078,6 +17005,9 @@ $root.google = (function() {
                         break;
                     case 65011:
                         message[".gogoproto.stdduration"] = reader.bool();
+                        break;
+                    case 65012:
+                        message[".gogoproto.wktpointer"] = reader.bool();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -17186,6 +17116,9 @@ $root.google = (function() {
                 if (message[".gogoproto.stdduration"] != null && message.hasOwnProperty(".gogoproto.stdduration"))
                     if (typeof message[".gogoproto.stdduration"] !== "boolean")
                         return ".gogoproto.stdduration: boolean expected";
+                if (message[".gogoproto.wktpointer"] != null && message.hasOwnProperty(".gogoproto.wktpointer"))
+                    if (typeof message[".gogoproto.wktpointer"] !== "boolean")
+                        return ".gogoproto.wktpointer: boolean expected";
                 return null;
             };
 
@@ -17269,6 +17202,8 @@ $root.google = (function() {
                     message[".gogoproto.stdtime"] = Boolean(object[".gogoproto.stdtime"]);
                 if (object[".gogoproto.stdduration"] != null)
                     message[".gogoproto.stdduration"] = Boolean(object[".gogoproto.stdduration"]);
+                if (object[".gogoproto.wktpointer"] != null)
+                    message[".gogoproto.wktpointer"] = Boolean(object[".gogoproto.wktpointer"]);
                 return message;
             };
 
@@ -17305,6 +17240,7 @@ $root.google = (function() {
                     object[".gogoproto.castvalue"] = "";
                     object[".gogoproto.stdtime"] = false;
                     object[".gogoproto.stdduration"] = false;
+                    object[".gogoproto.wktpointer"] = false;
                 }
                 if (message.ctype != null && message.hasOwnProperty("ctype"))
                     object.ctype = options.enums === String ? $root.google.protobuf.FieldOptions.CType[message.ctype] : message.ctype;
@@ -17345,6 +17281,8 @@ $root.google = (function() {
                     object[".gogoproto.stdtime"] = message[".gogoproto.stdtime"];
                 if (message[".gogoproto.stdduration"] != null && message.hasOwnProperty(".gogoproto.stdduration"))
                     object[".gogoproto.stdduration"] = message[".gogoproto.stdduration"];
+                if (message[".gogoproto.wktpointer"] != null && message.hasOwnProperty(".gogoproto.wktpointer"))
+                    object[".gogoproto.wktpointer"] = message[".gogoproto.wktpointer"];
                 return object;
             };
 
@@ -18458,7 +18396,6 @@ $root.google = (function() {
              * @memberof google.protobuf
              * @interface IMethodOptions
              * @property {boolean|null} [deprecated] MethodOptions deprecated
-             * @property {google.protobuf.MethodOptions.IdempotencyLevel|null} [idempotencyLevel] MethodOptions idempotencyLevel
              * @property {Array.<google.protobuf.IUninterpretedOption>|null} [uninterpretedOption] MethodOptions uninterpretedOption
              */
 
@@ -18485,14 +18422,6 @@ $root.google = (function() {
              * @instance
              */
             MethodOptions.prototype.deprecated = false;
-
-            /**
-             * MethodOptions idempotencyLevel.
-             * @member {google.protobuf.MethodOptions.IdempotencyLevel} idempotencyLevel
-             * @memberof google.protobuf.MethodOptions
-             * @instance
-             */
-            MethodOptions.prototype.idempotencyLevel = 0;
 
             /**
              * MethodOptions uninterpretedOption.
@@ -18528,8 +18457,6 @@ $root.google = (function() {
                     writer = $Writer.create();
                 if (message.deprecated != null && message.hasOwnProperty("deprecated"))
                     writer.uint32(/* id 33, wireType 0 =*/264).bool(message.deprecated);
-                if (message.idempotencyLevel != null && message.hasOwnProperty("idempotencyLevel"))
-                    writer.uint32(/* id 34, wireType 0 =*/272).int32(message.idempotencyLevel);
                 if (message.uninterpretedOption != null && message.uninterpretedOption.length)
                     for (var i = 0; i < message.uninterpretedOption.length; ++i)
                         $root.google.protobuf.UninterpretedOption.encode(message.uninterpretedOption[i], writer.uint32(/* id 999, wireType 2 =*/7994).fork()).ldelim();
@@ -18569,9 +18496,6 @@ $root.google = (function() {
                     switch (tag >>> 3) {
                     case 33:
                         message.deprecated = reader.bool();
-                        break;
-                    case 34:
-                        message.idempotencyLevel = reader.int32();
                         break;
                     case 999:
                         if (!(message.uninterpretedOption && message.uninterpretedOption.length))
@@ -18616,15 +18540,6 @@ $root.google = (function() {
                 if (message.deprecated != null && message.hasOwnProperty("deprecated"))
                     if (typeof message.deprecated !== "boolean")
                         return "deprecated: boolean expected";
-                if (message.idempotencyLevel != null && message.hasOwnProperty("idempotencyLevel"))
-                    switch (message.idempotencyLevel) {
-                    default:
-                        return "idempotencyLevel: enum value expected";
-                    case 0:
-                    case 1:
-                    case 2:
-                        break;
-                    }
                 if (message.uninterpretedOption != null && message.hasOwnProperty("uninterpretedOption")) {
                     if (!Array.isArray(message.uninterpretedOption))
                         return "uninterpretedOption: array expected";
@@ -18651,20 +18566,6 @@ $root.google = (function() {
                 var message = new $root.google.protobuf.MethodOptions();
                 if (object.deprecated != null)
                     message.deprecated = Boolean(object.deprecated);
-                switch (object.idempotencyLevel) {
-                case "IDEMPOTENCY_UNKNOWN":
-                case 0:
-                    message.idempotencyLevel = 0;
-                    break;
-                case "NO_SIDE_EFFECTS":
-                case 1:
-                    message.idempotencyLevel = 1;
-                    break;
-                case "IDEMPOTENT":
-                case 2:
-                    message.idempotencyLevel = 2;
-                    break;
-                }
                 if (object.uninterpretedOption) {
                     if (!Array.isArray(object.uninterpretedOption))
                         throw TypeError(".google.protobuf.MethodOptions.uninterpretedOption: array expected");
@@ -18693,14 +18594,10 @@ $root.google = (function() {
                 var object = {};
                 if (options.arrays || options.defaults)
                     object.uninterpretedOption = [];
-                if (options.defaults) {
+                if (options.defaults)
                     object.deprecated = false;
-                    object.idempotencyLevel = options.enums === String ? "IDEMPOTENCY_UNKNOWN" : 0;
-                }
                 if (message.deprecated != null && message.hasOwnProperty("deprecated"))
                     object.deprecated = message.deprecated;
-                if (message.idempotencyLevel != null && message.hasOwnProperty("idempotencyLevel"))
-                    object.idempotencyLevel = options.enums === String ? $root.google.protobuf.MethodOptions.IdempotencyLevel[message.idempotencyLevel] : message.idempotencyLevel;
                 if (message.uninterpretedOption && message.uninterpretedOption.length) {
                     object.uninterpretedOption = [];
                     for (var j = 0; j < message.uninterpretedOption.length; ++j)
@@ -18719,22 +18616,6 @@ $root.google = (function() {
             MethodOptions.prototype.toJSON = function toJSON() {
                 return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
             };
-
-            /**
-             * IdempotencyLevel enum.
-             * @name google.protobuf.MethodOptions.IdempotencyLevel
-             * @enum {string}
-             * @property {number} IDEMPOTENCY_UNKNOWN=0 IDEMPOTENCY_UNKNOWN value
-             * @property {number} NO_SIDE_EFFECTS=1 NO_SIDE_EFFECTS value
-             * @property {number} IDEMPOTENT=2 IDEMPOTENT value
-             */
-            MethodOptions.IdempotencyLevel = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "IDEMPOTENCY_UNKNOWN"] = 0;
-                values[valuesById[1] = "NO_SIDE_EFFECTS"] = 1;
-                values[valuesById[2] = "IDEMPOTENT"] = 2;
-                return values;
-            })();
 
             return MethodOptions;
         })();
@@ -21066,6 +20947,476 @@ $root.common = (function() {
     })();
 
     return common;
+})();
+
+$root.merkle = (function() {
+
+    /**
+     * Namespace merkle.
+     * @exports merkle
+     * @namespace
+     */
+    var merkle = {};
+
+    merkle.ProofOp = (function() {
+
+        /**
+         * Properties of a ProofOp.
+         * @memberof merkle
+         * @interface IProofOp
+         * @property {string|null} [type] ProofOp type
+         * @property {Uint8Array|null} [key] ProofOp key
+         * @property {Uint8Array|null} [data] ProofOp data
+         */
+
+        /**
+         * Constructs a new ProofOp.
+         * @memberof merkle
+         * @classdesc Represents a ProofOp.
+         * @implements IProofOp
+         * @constructor
+         * @param {merkle.IProofOp=} [properties] Properties to set
+         */
+        function ProofOp(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ProofOp type.
+         * @member {string} type
+         * @memberof merkle.ProofOp
+         * @instance
+         */
+        ProofOp.prototype.type = "";
+
+        /**
+         * ProofOp key.
+         * @member {Uint8Array} key
+         * @memberof merkle.ProofOp
+         * @instance
+         */
+        ProofOp.prototype.key = $util.newBuffer([]);
+
+        /**
+         * ProofOp data.
+         * @member {Uint8Array} data
+         * @memberof merkle.ProofOp
+         * @instance
+         */
+        ProofOp.prototype.data = $util.newBuffer([]);
+
+        /**
+         * Creates a new ProofOp instance using the specified properties.
+         * @function create
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {merkle.IProofOp=} [properties] Properties to set
+         * @returns {merkle.ProofOp} ProofOp instance
+         */
+        ProofOp.create = function create(properties) {
+            return new ProofOp(properties);
+        };
+
+        /**
+         * Encodes the specified ProofOp message. Does not implicitly {@link merkle.ProofOp.verify|verify} messages.
+         * @function encode
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {merkle.IProofOp} message ProofOp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ProofOp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.type != null && message.hasOwnProperty("type"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.type);
+            if (message.key != null && message.hasOwnProperty("key"))
+                writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.key);
+            if (message.data != null && message.hasOwnProperty("data"))
+                writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.data);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ProofOp message, length delimited. Does not implicitly {@link merkle.ProofOp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {merkle.IProofOp} message ProofOp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ProofOp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a ProofOp message from the specified reader or buffer.
+         * @function decode
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {merkle.ProofOp} ProofOp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ProofOp.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.merkle.ProofOp();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.type = reader.string();
+                    break;
+                case 2:
+                    message.key = reader.bytes();
+                    break;
+                case 3:
+                    message.data = reader.bytes();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a ProofOp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {merkle.ProofOp} ProofOp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ProofOp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a ProofOp message.
+         * @function verify
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ProofOp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                if (!$util.isString(message.type))
+                    return "type: string expected";
+            if (message.key != null && message.hasOwnProperty("key"))
+                if (!(message.key && typeof message.key.length === "number" || $util.isString(message.key)))
+                    return "key: buffer expected";
+            if (message.data != null && message.hasOwnProperty("data"))
+                if (!(message.data && typeof message.data.length === "number" || $util.isString(message.data)))
+                    return "data: buffer expected";
+            return null;
+        };
+
+        /**
+         * Creates a ProofOp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {merkle.ProofOp} ProofOp
+         */
+        ProofOp.fromObject = function fromObject(object) {
+            if (object instanceof $root.merkle.ProofOp)
+                return object;
+            var message = new $root.merkle.ProofOp();
+            if (object.type != null)
+                message.type = String(object.type);
+            if (object.key != null)
+                if (typeof object.key === "string")
+                    $util.base64.decode(object.key, message.key = $util.newBuffer($util.base64.length(object.key)), 0);
+                else if (object.key.length)
+                    message.key = object.key;
+            if (object.data != null)
+                if (typeof object.data === "string")
+                    $util.base64.decode(object.data, message.data = $util.newBuffer($util.base64.length(object.data)), 0);
+                else if (object.data.length)
+                    message.data = object.data;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a ProofOp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof merkle.ProofOp
+         * @static
+         * @param {merkle.ProofOp} message ProofOp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ProofOp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.type = "";
+                if (options.bytes === String)
+                    object.key = "";
+                else {
+                    object.key = [];
+                    if (options.bytes !== Array)
+                        object.key = $util.newBuffer(object.key);
+                }
+                if (options.bytes === String)
+                    object.data = "";
+                else {
+                    object.data = [];
+                    if (options.bytes !== Array)
+                        object.data = $util.newBuffer(object.data);
+                }
+            }
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = message.type;
+            if (message.key != null && message.hasOwnProperty("key"))
+                object.key = options.bytes === String ? $util.base64.encode(message.key, 0, message.key.length) : options.bytes === Array ? Array.prototype.slice.call(message.key) : message.key;
+            if (message.data != null && message.hasOwnProperty("data"))
+                object.data = options.bytes === String ? $util.base64.encode(message.data, 0, message.data.length) : options.bytes === Array ? Array.prototype.slice.call(message.data) : message.data;
+            return object;
+        };
+
+        /**
+         * Converts this ProofOp to JSON.
+         * @function toJSON
+         * @memberof merkle.ProofOp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ProofOp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return ProofOp;
+    })();
+
+    merkle.Proof = (function() {
+
+        /**
+         * Properties of a Proof.
+         * @memberof merkle
+         * @interface IProof
+         * @property {Array.<merkle.IProofOp>|null} [ops] Proof ops
+         */
+
+        /**
+         * Constructs a new Proof.
+         * @memberof merkle
+         * @classdesc Represents a Proof.
+         * @implements IProof
+         * @constructor
+         * @param {merkle.IProof=} [properties] Properties to set
+         */
+        function Proof(properties) {
+            this.ops = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Proof ops.
+         * @member {Array.<merkle.IProofOp>} ops
+         * @memberof merkle.Proof
+         * @instance
+         */
+        Proof.prototype.ops = $util.emptyArray;
+
+        /**
+         * Creates a new Proof instance using the specified properties.
+         * @function create
+         * @memberof merkle.Proof
+         * @static
+         * @param {merkle.IProof=} [properties] Properties to set
+         * @returns {merkle.Proof} Proof instance
+         */
+        Proof.create = function create(properties) {
+            return new Proof(properties);
+        };
+
+        /**
+         * Encodes the specified Proof message. Does not implicitly {@link merkle.Proof.verify|verify} messages.
+         * @function encode
+         * @memberof merkle.Proof
+         * @static
+         * @param {merkle.IProof} message Proof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Proof.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.ops != null && message.ops.length)
+                for (var i = 0; i < message.ops.length; ++i)
+                    $root.merkle.ProofOp.encode(message.ops[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Proof message, length delimited. Does not implicitly {@link merkle.Proof.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof merkle.Proof
+         * @static
+         * @param {merkle.IProof} message Proof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Proof.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Proof message from the specified reader or buffer.
+         * @function decode
+         * @memberof merkle.Proof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {merkle.Proof} Proof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Proof.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.merkle.Proof();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.ops && message.ops.length))
+                        message.ops = [];
+                    message.ops.push($root.merkle.ProofOp.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Proof message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof merkle.Proof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {merkle.Proof} Proof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Proof.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Proof message.
+         * @function verify
+         * @memberof merkle.Proof
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Proof.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.ops != null && message.hasOwnProperty("ops")) {
+                if (!Array.isArray(message.ops))
+                    return "ops: array expected";
+                for (var i = 0; i < message.ops.length; ++i) {
+                    var error = $root.merkle.ProofOp.verify(message.ops[i]);
+                    if (error)
+                        return "ops." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a Proof message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof merkle.Proof
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {merkle.Proof} Proof
+         */
+        Proof.fromObject = function fromObject(object) {
+            if (object instanceof $root.merkle.Proof)
+                return object;
+            var message = new $root.merkle.Proof();
+            if (object.ops) {
+                if (!Array.isArray(object.ops))
+                    throw TypeError(".merkle.Proof.ops: array expected");
+                message.ops = [];
+                for (var i = 0; i < object.ops.length; ++i) {
+                    if (typeof object.ops[i] !== "object")
+                        throw TypeError(".merkle.Proof.ops: object expected");
+                    message.ops[i] = $root.merkle.ProofOp.fromObject(object.ops[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Proof message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof merkle.Proof
+         * @static
+         * @param {merkle.Proof} message Proof
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Proof.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.ops = [];
+            if (message.ops && message.ops.length) {
+                object.ops = [];
+                for (var j = 0; j < message.ops.length; ++j)
+                    object.ops[j] = $root.merkle.ProofOp.toObject(message.ops[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this Proof to JSON.
+         * @function toJSON
+         * @memberof merkle.Proof
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Proof.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Proof;
+    })();
+
+    return merkle;
 })();
 
 module.exports = $root;

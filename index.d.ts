@@ -334,6 +334,12 @@ export namespace abci {
 
         /** RequestInfo version */
         version?: (string|null);
+
+        /** RequestInfo blockVersion */
+        blockVersion?: (number|Long|null);
+
+        /** RequestInfo p2pVersion */
+        p2pVersion?: (number|Long|null);
     }
 
     /** Represents a RequestInfo. */
@@ -347,6 +353,12 @@ export namespace abci {
 
         /** RequestInfo version. */
         public version: string;
+
+        /** RequestInfo blockVersion. */
+        public blockVersion: (number|Long);
+
+        /** RequestInfo p2pVersion. */
+        public p2pVersion: (number|Long);
 
         /**
          * Creates a new RequestInfo instance using the specified properties.
@@ -1631,6 +1643,9 @@ export namespace abci {
         /** ResponseInfo version */
         version?: (string|null);
 
+        /** ResponseInfo appVersion */
+        appVersion?: (number|Long|null);
+
         /** ResponseInfo lastBlockHeight */
         lastBlockHeight?: (number|Long|null);
 
@@ -1652,6 +1667,9 @@ export namespace abci {
 
         /** ResponseInfo version. */
         public version: string;
+
+        /** ResponseInfo appVersion. */
+        public appVersion: (number|Long);
 
         /** ResponseInfo lastBlockHeight. */
         public lastBlockHeight: (number|Long);
@@ -1950,10 +1968,13 @@ export namespace abci {
         value?: (Uint8Array|null);
 
         /** ResponseQuery proof */
-        proof?: (Uint8Array|null);
+        proof?: (merkle.IProof|null);
 
         /** ResponseQuery height */
         height?: (number|Long|null);
+
+        /** ResponseQuery codespace */
+        codespace?: (string|null);
     }
 
     /** Represents a ResponseQuery. */
@@ -1984,10 +2005,13 @@ export namespace abci {
         public value: Uint8Array;
 
         /** ResponseQuery proof. */
-        public proof: Uint8Array;
+        public proof?: (merkle.IProof|null);
 
         /** ResponseQuery height. */
         public height: (number|Long);
+
+        /** ResponseQuery codespace. */
+        public codespace: string;
 
         /**
          * Creates a new ResponseQuery instance using the specified properties.
@@ -2173,6 +2197,9 @@ export namespace abci {
 
         /** ResponseCheckTx tags */
         tags?: (common.IKVPair[]|null);
+
+        /** ResponseCheckTx codespace */
+        codespace?: (string|null);
     }
 
     /** Represents a ResponseCheckTx. */
@@ -2204,6 +2231,9 @@ export namespace abci {
 
         /** ResponseCheckTx tags. */
         public tags: common.IKVPair[];
+
+        /** ResponseCheckTx codespace. */
+        public codespace: string;
 
         /**
          * Creates a new ResponseCheckTx instance using the specified properties.
@@ -2299,6 +2329,9 @@ export namespace abci {
 
         /** ResponseDeliverTx tags */
         tags?: (common.IKVPair[]|null);
+
+        /** ResponseDeliverTx codespace */
+        codespace?: (string|null);
     }
 
     /** Represents a ResponseDeliverTx. */
@@ -2330,6 +2363,9 @@ export namespace abci {
 
         /** ResponseDeliverTx tags. */
         public tags: common.IKVPair[];
+
+        /** ResponseDeliverTx codespace. */
+        public codespace: string;
 
         /**
          * Creates a new ResponseDeliverTx instance using the specified properties.
@@ -2598,13 +2634,13 @@ export namespace abci {
     interface IConsensusParams {
 
         /** ConsensusParams blockSize */
-        blockSize?: (abci.IBlockSize|null);
+        blockSize?: (abci.IBlockSizeParams|null);
 
-        /** ConsensusParams txSize */
-        txSize?: (abci.ITxSize|null);
+        /** ConsensusParams evidence */
+        evidence?: (abci.IEvidenceParams|null);
 
-        /** ConsensusParams blockGossip */
-        blockGossip?: (abci.IBlockGossip|null);
+        /** ConsensusParams validator */
+        validator?: (abci.IValidatorParams|null);
     }
 
     /** Represents a ConsensusParams. */
@@ -2617,13 +2653,13 @@ export namespace abci {
         constructor(properties?: abci.IConsensusParams);
 
         /** ConsensusParams blockSize. */
-        public blockSize?: (abci.IBlockSize|null);
+        public blockSize?: (abci.IBlockSizeParams|null);
 
-        /** ConsensusParams txSize. */
-        public txSize?: (abci.ITxSize|null);
+        /** ConsensusParams evidence. */
+        public evidence?: (abci.IEvidenceParams|null);
 
-        /** ConsensusParams blockGossip. */
-        public blockGossip?: (abci.IBlockGossip|null);
+        /** ConsensusParams validator. */
+        public validator?: (abci.IValidatorParams|null);
 
         /**
          * Creates a new ConsensusParams instance using the specified properties.
@@ -2696,283 +2732,277 @@ export namespace abci {
         public toJSON(): { [k: string]: any };
     }
 
-    /** Properties of a BlockSize. */
-    interface IBlockSize {
+    /** Properties of a BlockSizeParams. */
+    interface IBlockSizeParams {
 
-        /** BlockSize maxBytes */
-        maxBytes?: (number|null);
+        /** BlockSizeParams maxBytes */
+        maxBytes?: (number|Long|null);
 
-        /** BlockSize maxGas */
+        /** BlockSizeParams maxGas */
         maxGas?: (number|Long|null);
     }
 
-    /** Represents a BlockSize. */
-    class BlockSize implements IBlockSize {
+    /** Represents a BlockSizeParams. */
+    class BlockSizeParams implements IBlockSizeParams {
 
         /**
-         * Constructs a new BlockSize.
+         * Constructs a new BlockSizeParams.
          * @param [properties] Properties to set
          */
-        constructor(properties?: abci.IBlockSize);
+        constructor(properties?: abci.IBlockSizeParams);
 
-        /** BlockSize maxBytes. */
-        public maxBytes: number;
+        /** BlockSizeParams maxBytes. */
+        public maxBytes: (number|Long);
 
-        /** BlockSize maxGas. */
+        /** BlockSizeParams maxGas. */
         public maxGas: (number|Long);
 
         /**
-         * Creates a new BlockSize instance using the specified properties.
+         * Creates a new BlockSizeParams instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns BlockSize instance
+         * @returns BlockSizeParams instance
          */
-        public static create(properties?: abci.IBlockSize): abci.BlockSize;
+        public static create(properties?: abci.IBlockSizeParams): abci.BlockSizeParams;
 
         /**
-         * Encodes the specified BlockSize message. Does not implicitly {@link abci.BlockSize.verify|verify} messages.
-         * @param message BlockSize message or plain object to encode
+         * Encodes the specified BlockSizeParams message. Does not implicitly {@link abci.BlockSizeParams.verify|verify} messages.
+         * @param message BlockSizeParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: abci.IBlockSize, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: abci.IBlockSizeParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified BlockSize message, length delimited. Does not implicitly {@link abci.BlockSize.verify|verify} messages.
-         * @param message BlockSize message or plain object to encode
+         * Encodes the specified BlockSizeParams message, length delimited. Does not implicitly {@link abci.BlockSizeParams.verify|verify} messages.
+         * @param message BlockSizeParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: abci.IBlockSize, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: abci.IBlockSizeParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a BlockSize message from the specified reader or buffer.
+         * Decodes a BlockSizeParams message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns BlockSize
+         * @returns BlockSizeParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.BlockSize;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.BlockSizeParams;
 
         /**
-         * Decodes a BlockSize message from the specified reader or buffer, length delimited.
+         * Decodes a BlockSizeParams message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns BlockSize
+         * @returns BlockSizeParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.BlockSize;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.BlockSizeParams;
 
         /**
-         * Verifies a BlockSize message.
+         * Verifies a BlockSizeParams message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a BlockSize message from a plain object. Also converts values to their respective internal types.
+         * Creates a BlockSizeParams message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns BlockSize
+         * @returns BlockSizeParams
          */
-        public static fromObject(object: { [k: string]: any }): abci.BlockSize;
+        public static fromObject(object: { [k: string]: any }): abci.BlockSizeParams;
 
         /**
-         * Creates a plain object from a BlockSize message. Also converts values to other types if specified.
-         * @param message BlockSize
+         * Creates a plain object from a BlockSizeParams message. Also converts values to other types if specified.
+         * @param message BlockSizeParams
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: abci.BlockSize, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: abci.BlockSizeParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this BlockSize to JSON.
+         * Converts this BlockSizeParams to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
     }
 
-    /** Properties of a TxSize. */
-    interface ITxSize {
+    /** Properties of an EvidenceParams. */
+    interface IEvidenceParams {
 
-        /** TxSize maxBytes */
-        maxBytes?: (number|null);
-
-        /** TxSize maxGas */
-        maxGas?: (number|Long|null);
+        /** EvidenceParams maxAge */
+        maxAge?: (number|Long|null);
     }
 
-    /** Represents a TxSize. */
-    class TxSize implements ITxSize {
+    /** Represents an EvidenceParams. */
+    class EvidenceParams implements IEvidenceParams {
 
         /**
-         * Constructs a new TxSize.
+         * Constructs a new EvidenceParams.
          * @param [properties] Properties to set
          */
-        constructor(properties?: abci.ITxSize);
+        constructor(properties?: abci.IEvidenceParams);
 
-        /** TxSize maxBytes. */
-        public maxBytes: number;
-
-        /** TxSize maxGas. */
-        public maxGas: (number|Long);
+        /** EvidenceParams maxAge. */
+        public maxAge: (number|Long);
 
         /**
-         * Creates a new TxSize instance using the specified properties.
+         * Creates a new EvidenceParams instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns TxSize instance
+         * @returns EvidenceParams instance
          */
-        public static create(properties?: abci.ITxSize): abci.TxSize;
+        public static create(properties?: abci.IEvidenceParams): abci.EvidenceParams;
 
         /**
-         * Encodes the specified TxSize message. Does not implicitly {@link abci.TxSize.verify|verify} messages.
-         * @param message TxSize message or plain object to encode
+         * Encodes the specified EvidenceParams message. Does not implicitly {@link abci.EvidenceParams.verify|verify} messages.
+         * @param message EvidenceParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: abci.ITxSize, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: abci.IEvidenceParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified TxSize message, length delimited. Does not implicitly {@link abci.TxSize.verify|verify} messages.
-         * @param message TxSize message or plain object to encode
+         * Encodes the specified EvidenceParams message, length delimited. Does not implicitly {@link abci.EvidenceParams.verify|verify} messages.
+         * @param message EvidenceParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: abci.ITxSize, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: abci.IEvidenceParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a TxSize message from the specified reader or buffer.
+         * Decodes an EvidenceParams message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns TxSize
+         * @returns EvidenceParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.TxSize;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.EvidenceParams;
 
         /**
-         * Decodes a TxSize message from the specified reader or buffer, length delimited.
+         * Decodes an EvidenceParams message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns TxSize
+         * @returns EvidenceParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.TxSize;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.EvidenceParams;
 
         /**
-         * Verifies a TxSize message.
+         * Verifies an EvidenceParams message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a TxSize message from a plain object. Also converts values to their respective internal types.
+         * Creates an EvidenceParams message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns TxSize
+         * @returns EvidenceParams
          */
-        public static fromObject(object: { [k: string]: any }): abci.TxSize;
+        public static fromObject(object: { [k: string]: any }): abci.EvidenceParams;
 
         /**
-         * Creates a plain object from a TxSize message. Also converts values to other types if specified.
-         * @param message TxSize
+         * Creates a plain object from an EvidenceParams message. Also converts values to other types if specified.
+         * @param message EvidenceParams
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: abci.TxSize, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: abci.EvidenceParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this TxSize to JSON.
+         * Converts this EvidenceParams to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
     }
 
-    /** Properties of a BlockGossip. */
-    interface IBlockGossip {
+    /** Properties of a ValidatorParams. */
+    interface IValidatorParams {
 
-        /** BlockGossip blockPartSizeBytes */
-        blockPartSizeBytes?: (number|null);
+        /** ValidatorParams pubKeyTypes */
+        pubKeyTypes?: (string[]|null);
     }
 
-    /** Represents a BlockGossip. */
-    class BlockGossip implements IBlockGossip {
+    /** Represents a ValidatorParams. */
+    class ValidatorParams implements IValidatorParams {
 
         /**
-         * Constructs a new BlockGossip.
+         * Constructs a new ValidatorParams.
          * @param [properties] Properties to set
          */
-        constructor(properties?: abci.IBlockGossip);
+        constructor(properties?: abci.IValidatorParams);
 
-        /** BlockGossip blockPartSizeBytes. */
-        public blockPartSizeBytes: number;
+        /** ValidatorParams pubKeyTypes. */
+        public pubKeyTypes: string[];
 
         /**
-         * Creates a new BlockGossip instance using the specified properties.
+         * Creates a new ValidatorParams instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns BlockGossip instance
+         * @returns ValidatorParams instance
          */
-        public static create(properties?: abci.IBlockGossip): abci.BlockGossip;
+        public static create(properties?: abci.IValidatorParams): abci.ValidatorParams;
 
         /**
-         * Encodes the specified BlockGossip message. Does not implicitly {@link abci.BlockGossip.verify|verify} messages.
-         * @param message BlockGossip message or plain object to encode
+         * Encodes the specified ValidatorParams message. Does not implicitly {@link abci.ValidatorParams.verify|verify} messages.
+         * @param message ValidatorParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: abci.IBlockGossip, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: abci.IValidatorParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified BlockGossip message, length delimited. Does not implicitly {@link abci.BlockGossip.verify|verify} messages.
-         * @param message BlockGossip message or plain object to encode
+         * Encodes the specified ValidatorParams message, length delimited. Does not implicitly {@link abci.ValidatorParams.verify|verify} messages.
+         * @param message ValidatorParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: abci.IBlockGossip, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: abci.IValidatorParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a BlockGossip message from the specified reader or buffer.
+         * Decodes a ValidatorParams message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns BlockGossip
+         * @returns ValidatorParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.BlockGossip;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.ValidatorParams;
 
         /**
-         * Decodes a BlockGossip message from the specified reader or buffer, length delimited.
+         * Decodes a ValidatorParams message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns BlockGossip
+         * @returns ValidatorParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.BlockGossip;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.ValidatorParams;
 
         /**
-         * Verifies a BlockGossip message.
+         * Verifies a ValidatorParams message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a BlockGossip message from a plain object. Also converts values to their respective internal types.
+         * Creates a ValidatorParams message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns BlockGossip
+         * @returns ValidatorParams
          */
-        public static fromObject(object: { [k: string]: any }): abci.BlockGossip;
+        public static fromObject(object: { [k: string]: any }): abci.ValidatorParams;
 
         /**
-         * Creates a plain object from a BlockGossip message. Also converts values to other types if specified.
-         * @param message BlockGossip
+         * Creates a plain object from a ValidatorParams message. Also converts values to other types if specified.
+         * @param message ValidatorParams
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: abci.BlockGossip, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: abci.ValidatorParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this BlockGossip to JSON.
+         * Converts this ValidatorParams to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
@@ -3077,6 +3107,9 @@ export namespace abci {
     /** Properties of a Header. */
     interface IHeader {
 
+        /** Header version */
+        version?: (abci.IVersion|null);
+
         /** Header chainId */
         chainId?: (string|null);
 
@@ -3131,6 +3164,9 @@ export namespace abci {
          * @param [properties] Properties to set
          */
         constructor(properties?: abci.IHeader);
+
+        /** Header version. */
+        public version?: (abci.IVersion|null);
 
         /** Header chainId. */
         public chainId: string;
@@ -3243,6 +3279,102 @@ export namespace abci {
 
         /**
          * Converts this Header to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a Version. */
+    interface IVersion {
+
+        /** Version Block */
+        Block?: (number|Long|null);
+
+        /** Version App */
+        App?: (number|Long|null);
+    }
+
+    /** Represents a Version. */
+    class Version implements IVersion {
+
+        /**
+         * Constructs a new Version.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: abci.IVersion);
+
+        /** Version Block. */
+        public Block: (number|Long);
+
+        /** Version App. */
+        public App: (number|Long);
+
+        /**
+         * Creates a new Version instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Version instance
+         */
+        public static create(properties?: abci.IVersion): abci.Version;
+
+        /**
+         * Encodes the specified Version message. Does not implicitly {@link abci.Version.verify|verify} messages.
+         * @param message Version message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: abci.IVersion, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Version message, length delimited. Does not implicitly {@link abci.Version.verify|verify} messages.
+         * @param message Version message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: abci.IVersion, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Version message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Version
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.Version;
+
+        /**
+         * Decodes a Version message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Version
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.Version;
+
+        /**
+         * Verifies a Version message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Version message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Version
+         */
+        public static fromObject(object: { [k: string]: any }): abci.Version;
+
+        /**
+         * Creates a plain object from a Version message. Also converts values to other types if specified.
+         * @param message Version
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: abci.Version, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Version to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
@@ -4600,9 +4732,6 @@ export namespace google {
 
                 /** ExtensionRange end */
                 end?: (number|null);
-
-                /** ExtensionRange options */
-                options?: (google.protobuf.IExtensionRangeOptions|null);
             }
 
             /** Represents an ExtensionRange. */
@@ -4619,9 +4748,6 @@ export namespace google {
 
                 /** ExtensionRange end. */
                 public end: number;
-
-                /** ExtensionRange options. */
-                public options?: (google.protobuf.IExtensionRangeOptions|null);
 
                 /**
                  * Creates a new ExtensionRange instance using the specified properties.
@@ -4789,96 +4915,6 @@ export namespace google {
                  */
                 public toJSON(): { [k: string]: any };
             }
-        }
-
-        /** Properties of an ExtensionRangeOptions. */
-        interface IExtensionRangeOptions {
-
-            /** ExtensionRangeOptions uninterpretedOption */
-            uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
-        }
-
-        /** Represents an ExtensionRangeOptions. */
-        class ExtensionRangeOptions implements IExtensionRangeOptions {
-
-            /**
-             * Constructs a new ExtensionRangeOptions.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: google.protobuf.IExtensionRangeOptions);
-
-            /** ExtensionRangeOptions uninterpretedOption. */
-            public uninterpretedOption: google.protobuf.IUninterpretedOption[];
-
-            /**
-             * Creates a new ExtensionRangeOptions instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ExtensionRangeOptions instance
-             */
-            public static create(properties?: google.protobuf.IExtensionRangeOptions): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Encodes the specified ExtensionRangeOptions message. Does not implicitly {@link google.protobuf.ExtensionRangeOptions.verify|verify} messages.
-             * @param message ExtensionRangeOptions message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: google.protobuf.IExtensionRangeOptions, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified ExtensionRangeOptions message, length delimited. Does not implicitly {@link google.protobuf.ExtensionRangeOptions.verify|verify} messages.
-             * @param message ExtensionRangeOptions message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: google.protobuf.IExtensionRangeOptions, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an ExtensionRangeOptions message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ExtensionRangeOptions
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Decodes an ExtensionRangeOptions message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns ExtensionRangeOptions
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Verifies an ExtensionRangeOptions message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates an ExtensionRangeOptions message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns ExtensionRangeOptions
-             */
-            public static fromObject(object: { [k: string]: any }): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Creates a plain object from an ExtensionRangeOptions message. Also converts values to other types if specified.
-             * @param message ExtensionRangeOptions
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: google.protobuf.ExtensionRangeOptions, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this ExtensionRangeOptions to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
         }
 
         /** Properties of a FieldDescriptorProto. */
@@ -5164,12 +5200,6 @@ export namespace google {
 
             /** EnumDescriptorProto options */
             options?: (google.protobuf.IEnumOptions|null);
-
-            /** EnumDescriptorProto reservedRange */
-            reservedRange?: (google.protobuf.EnumDescriptorProto.IEnumReservedRange[]|null);
-
-            /** EnumDescriptorProto reservedName */
-            reservedName?: (string[]|null);
         }
 
         /** Represents an EnumDescriptorProto. */
@@ -5189,12 +5219,6 @@ export namespace google {
 
             /** EnumDescriptorProto options. */
             public options?: (google.protobuf.IEnumOptions|null);
-
-            /** EnumDescriptorProto reservedRange. */
-            public reservedRange: google.protobuf.EnumDescriptorProto.IEnumReservedRange[];
-
-            /** EnumDescriptorProto reservedName. */
-            public reservedName: string[];
 
             /**
              * Creates a new EnumDescriptorProto instance using the specified properties.
@@ -5265,105 +5289,6 @@ export namespace google {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
-        }
-
-        namespace EnumDescriptorProto {
-
-            /** Properties of an EnumReservedRange. */
-            interface IEnumReservedRange {
-
-                /** EnumReservedRange start */
-                start?: (number|null);
-
-                /** EnumReservedRange end */
-                end?: (number|null);
-            }
-
-            /** Represents an EnumReservedRange. */
-            class EnumReservedRange implements IEnumReservedRange {
-
-                /**
-                 * Constructs a new EnumReservedRange.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: google.protobuf.EnumDescriptorProto.IEnumReservedRange);
-
-                /** EnumReservedRange start. */
-                public start: number;
-
-                /** EnumReservedRange end. */
-                public end: number;
-
-                /**
-                 * Creates a new EnumReservedRange instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns EnumReservedRange instance
-                 */
-                public static create(properties?: google.protobuf.EnumDescriptorProto.IEnumReservedRange): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Encodes the specified EnumReservedRange message. Does not implicitly {@link google.protobuf.EnumDescriptorProto.EnumReservedRange.verify|verify} messages.
-                 * @param message EnumReservedRange message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: google.protobuf.EnumDescriptorProto.IEnumReservedRange, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified EnumReservedRange message, length delimited. Does not implicitly {@link google.protobuf.EnumDescriptorProto.EnumReservedRange.verify|verify} messages.
-                 * @param message EnumReservedRange message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: google.protobuf.EnumDescriptorProto.IEnumReservedRange, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes an EnumReservedRange message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns EnumReservedRange
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Decodes an EnumReservedRange message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns EnumReservedRange
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Verifies an EnumReservedRange message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates an EnumReservedRange message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns EnumReservedRange
-                 */
-                public static fromObject(object: { [k: string]: any }): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Creates a plain object from an EnumReservedRange message. Also converts values to other types if specified.
-                 * @param message EnumReservedRange
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: google.protobuf.EnumDescriptorProto.EnumReservedRange, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this EnumReservedRange to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-            }
         }
 
         /** Properties of an EnumValueDescriptorProto. */
@@ -5723,9 +5648,6 @@ export namespace google {
             /** FileOptions pyGenericServices */
             pyGenericServices?: (boolean|null);
 
-            /** FileOptions phpGenericServices */
-            phpGenericServices?: (boolean|null);
-
             /** FileOptions deprecated */
             deprecated?: (boolean|null);
 
@@ -5737,15 +5659,6 @@ export namespace google {
 
             /** FileOptions csharpNamespace */
             csharpNamespace?: (string|null);
-
-            /** FileOptions swiftPrefix */
-            swiftPrefix?: (string|null);
-
-            /** FileOptions phpClassPrefix */
-            phpClassPrefix?: (string|null);
-
-            /** FileOptions phpNamespace */
-            phpNamespace?: (string|null);
 
             /** FileOptions uninterpretedOption */
             uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
@@ -5839,6 +5752,12 @@ export namespace google {
 
             /** FileOptions .gogoproto.messagenameAll */
             ".gogoproto.messagenameAll"?: (boolean|null);
+
+            /** FileOptions .gogoproto.goprotoSizecacheAll */
+            ".gogoproto.goprotoSizecacheAll"?: (boolean|null);
+
+            /** FileOptions .gogoproto.goprotoUnkeyedAll */
+            ".gogoproto.goprotoUnkeyedAll"?: (boolean|null);
         }
 
         /** Represents a FileOptions. */
@@ -5880,9 +5799,6 @@ export namespace google {
             /** FileOptions pyGenericServices. */
             public pyGenericServices: boolean;
 
-            /** FileOptions phpGenericServices. */
-            public phpGenericServices: boolean;
-
             /** FileOptions deprecated. */
             public deprecated: boolean;
 
@@ -5894,15 +5810,6 @@ export namespace google {
 
             /** FileOptions csharpNamespace. */
             public csharpNamespace: string;
-
-            /** FileOptions swiftPrefix. */
-            public swiftPrefix: string;
-
-            /** FileOptions phpClassPrefix. */
-            public phpClassPrefix: string;
-
-            /** FileOptions phpNamespace. */
-            public phpNamespace: string;
 
             /** FileOptions uninterpretedOption. */
             public uninterpretedOption: google.protobuf.IUninterpretedOption[];
@@ -6077,6 +5984,12 @@ export namespace google {
 
             /** MessageOptions .gogoproto.messagename */
             ".gogoproto.messagename"?: (boolean|null);
+
+            /** MessageOptions .gogoproto.goprotoSizecache */
+            ".gogoproto.goprotoSizecache"?: (boolean|null);
+
+            /** MessageOptions .gogoproto.goprotoUnkeyed */
+            ".gogoproto.goprotoUnkeyed"?: (boolean|null);
         }
 
         /** Represents a MessageOptions. */
@@ -6230,6 +6143,9 @@ export namespace google {
 
             /** FieldOptions .gogoproto.stdduration */
             ".gogoproto.stdduration"?: (boolean|null);
+
+            /** FieldOptions .gogoproto.wktpointer */
+            ".gogoproto.wktpointer"?: (boolean|null);
         }
 
         /** Represents a FieldOptions. */
@@ -6758,9 +6674,6 @@ export namespace google {
             /** MethodOptions deprecated */
             deprecated?: (boolean|null);
 
-            /** MethodOptions idempotencyLevel */
-            idempotencyLevel?: (google.protobuf.MethodOptions.IdempotencyLevel|null);
-
             /** MethodOptions uninterpretedOption */
             uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
         }
@@ -6776,9 +6689,6 @@ export namespace google {
 
             /** MethodOptions deprecated. */
             public deprecated: boolean;
-
-            /** MethodOptions idempotencyLevel. */
-            public idempotencyLevel: google.protobuf.MethodOptions.IdempotencyLevel;
 
             /** MethodOptions uninterpretedOption. */
             public uninterpretedOption: google.protobuf.IUninterpretedOption[];
@@ -6852,16 +6762,6 @@ export namespace google {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
-        }
-
-        namespace MethodOptions {
-
-            /** IdempotencyLevel enum. */
-            enum IdempotencyLevel {
-                IDEMPOTENCY_UNKNOWN = 0,
-                NO_SIDE_EFFECTS = 1,
-                IDEMPOTENT = 2
-            }
         }
 
         /** Properties of an UninterpretedOption. */
@@ -7785,6 +7685,202 @@ export namespace common {
 
         /**
          * Converts this KI64Pair to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+}
+
+/** Namespace merkle. */
+export namespace merkle {
+
+    /** Properties of a ProofOp. */
+    interface IProofOp {
+
+        /** ProofOp type */
+        type?: (string|null);
+
+        /** ProofOp key */
+        key?: (Uint8Array|null);
+
+        /** ProofOp data */
+        data?: (Uint8Array|null);
+    }
+
+    /** Represents a ProofOp. */
+    class ProofOp implements IProofOp {
+
+        /**
+         * Constructs a new ProofOp.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: merkle.IProofOp);
+
+        /** ProofOp type. */
+        public type: string;
+
+        /** ProofOp key. */
+        public key: Uint8Array;
+
+        /** ProofOp data. */
+        public data: Uint8Array;
+
+        /**
+         * Creates a new ProofOp instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns ProofOp instance
+         */
+        public static create(properties?: merkle.IProofOp): merkle.ProofOp;
+
+        /**
+         * Encodes the specified ProofOp message. Does not implicitly {@link merkle.ProofOp.verify|verify} messages.
+         * @param message ProofOp message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: merkle.IProofOp, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified ProofOp message, length delimited. Does not implicitly {@link merkle.ProofOp.verify|verify} messages.
+         * @param message ProofOp message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: merkle.IProofOp, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a ProofOp message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns ProofOp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): merkle.ProofOp;
+
+        /**
+         * Decodes a ProofOp message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns ProofOp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): merkle.ProofOp;
+
+        /**
+         * Verifies a ProofOp message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a ProofOp message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns ProofOp
+         */
+        public static fromObject(object: { [k: string]: any }): merkle.ProofOp;
+
+        /**
+         * Creates a plain object from a ProofOp message. Also converts values to other types if specified.
+         * @param message ProofOp
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: merkle.ProofOp, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this ProofOp to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a Proof. */
+    interface IProof {
+
+        /** Proof ops */
+        ops?: (merkle.IProofOp[]|null);
+    }
+
+    /** Represents a Proof. */
+    class Proof implements IProof {
+
+        /**
+         * Constructs a new Proof.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: merkle.IProof);
+
+        /** Proof ops. */
+        public ops: merkle.IProofOp[];
+
+        /**
+         * Creates a new Proof instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Proof instance
+         */
+        public static create(properties?: merkle.IProof): merkle.Proof;
+
+        /**
+         * Encodes the specified Proof message. Does not implicitly {@link merkle.Proof.verify|verify} messages.
+         * @param message Proof message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: merkle.IProof, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Proof message, length delimited. Does not implicitly {@link merkle.Proof.verify|verify} messages.
+         * @param message Proof message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: merkle.IProof, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Proof message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Proof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): merkle.Proof;
+
+        /**
+         * Decodes a Proof message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Proof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): merkle.Proof;
+
+        /**
+         * Verifies a Proof message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Proof message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Proof
+         */
+        public static fromObject(object: { [k: string]: any }): merkle.Proof;
+
+        /**
+         * Creates a plain object from a Proof message. Also converts values to other types if specified.
+         * @param message Proof
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: merkle.Proof, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Proof to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
