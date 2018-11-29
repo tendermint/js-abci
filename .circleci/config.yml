@@ -11,7 +11,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: NPM Install
-          command: npm install
+          command: npm install -g abci
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
