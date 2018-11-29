@@ -11,13 +11,13 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: NPM Install ABCI
-          command: npm install abci
-      - run:
-          name: NPM Install standard
-          command: npm install standard
-      - run:
-          name: NPM Install NYC
-          command: npm install nyc
+          command: npm install
+          #      - run:
+          #          name: NPM Install standard
+          #          command: npm install standard
+          #      - run:
+          #          name: NPM Install NYC
+          #          command: npm install nyc
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
@@ -25,14 +25,3 @@ jobs:
       - run:
           name: NPM Test
           command: npm test
-      - run:
-          name: code-coverage
-          command: './node_modules/.bin/nyc report --reporter=text-lcov'
-      - store_artifacts:
-          path: test-results.xml
-          prefix: tests
-      - store_artifacts:
-          path: coverage
-          prefix: coverage
-      - store_test_results:
-          path: test-results.xml
