@@ -8606,6 +8606,247 @@ $root.abci = (function() {
     })();
 
     abci.Version = (function() {
+<<<<<<< HEAD
+=======
+
+        /**
+         * Properties of a Version.
+         * @memberof abci
+         * @interface IVersion
+         * @property {number|Long|null} [Block] Version Block
+         * @property {number|Long|null} [App] Version App
+         */
+
+        /**
+         * Constructs a new Version.
+         * @memberof abci
+         * @classdesc Represents a Version.
+         * @implements IVersion
+         * @constructor
+         * @param {abci.IVersion=} [properties] Properties to set
+         */
+        function Version(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Version Block.
+         * @member {number|Long} Block
+         * @memberof abci.Version
+         * @instance
+         */
+        Version.prototype.Block = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+        /**
+         * Version App.
+         * @member {number|Long} App
+         * @memberof abci.Version
+         * @instance
+         */
+        Version.prototype.App = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+        /**
+         * Creates a new Version instance using the specified properties.
+         * @function create
+         * @memberof abci.Version
+         * @static
+         * @param {abci.IVersion=} [properties] Properties to set
+         * @returns {abci.Version} Version instance
+         */
+        Version.create = function create(properties) {
+            return new Version(properties);
+        };
+
+        /**
+         * Encodes the specified Version message. Does not implicitly {@link abci.Version.verify|verify} messages.
+         * @function encode
+         * @memberof abci.Version
+         * @static
+         * @param {abci.IVersion} message Version message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Version.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.Block != null && message.hasOwnProperty("Block"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.Block);
+            if (message.App != null && message.hasOwnProperty("App"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.App);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Version message, length delimited. Does not implicitly {@link abci.Version.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof abci.Version
+         * @static
+         * @param {abci.IVersion} message Version message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Version.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Version message from the specified reader or buffer.
+         * @function decode
+         * @memberof abci.Version
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {abci.Version} Version
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Version.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.abci.Version();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.Block = reader.uint64();
+                    break;
+                case 2:
+                    message.App = reader.uint64();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Version message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof abci.Version
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {abci.Version} Version
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Version.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Version message.
+         * @function verify
+         * @memberof abci.Version
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Version.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.Block != null && message.hasOwnProperty("Block"))
+                if (!$util.isInteger(message.Block) && !(message.Block && $util.isInteger(message.Block.low) && $util.isInteger(message.Block.high)))
+                    return "Block: integer|Long expected";
+            if (message.App != null && message.hasOwnProperty("App"))
+                if (!$util.isInteger(message.App) && !(message.App && $util.isInteger(message.App.low) && $util.isInteger(message.App.high)))
+                    return "App: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a Version message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof abci.Version
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {abci.Version} Version
+         */
+        Version.fromObject = function fromObject(object) {
+            if (object instanceof $root.abci.Version)
+                return object;
+            var message = new $root.abci.Version();
+            if (object.Block != null)
+                if ($util.Long)
+                    (message.Block = $util.Long.fromValue(object.Block)).unsigned = true;
+                else if (typeof object.Block === "string")
+                    message.Block = parseInt(object.Block, 10);
+                else if (typeof object.Block === "number")
+                    message.Block = object.Block;
+                else if (typeof object.Block === "object")
+                    message.Block = new $util.LongBits(object.Block.low >>> 0, object.Block.high >>> 0).toNumber(true);
+            if (object.App != null)
+                if ($util.Long)
+                    (message.App = $util.Long.fromValue(object.App)).unsigned = true;
+                else if (typeof object.App === "string")
+                    message.App = parseInt(object.App, 10);
+                else if (typeof object.App === "number")
+                    message.App = object.App;
+                else if (typeof object.App === "object")
+                    message.App = new $util.LongBits(object.App.low >>> 0, object.App.high >>> 0).toNumber(true);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Version message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof abci.Version
+         * @static
+         * @param {abci.Version} message Version
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Version.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.Block = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.Block = options.longs === String ? "0" : 0;
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, true);
+                    object.App = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.App = options.longs === String ? "0" : 0;
+            }
+            if (message.Block != null && message.hasOwnProperty("Block"))
+                if (typeof message.Block === "number")
+                    object.Block = options.longs === String ? String(message.Block) : message.Block;
+                else
+                    object.Block = options.longs === String ? $util.Long.prototype.toString.call(message.Block) : options.longs === Number ? new $util.LongBits(message.Block.low >>> 0, message.Block.high >>> 0).toNumber(true) : message.Block;
+            if (message.App != null && message.hasOwnProperty("App"))
+                if (typeof message.App === "number")
+                    object.App = options.longs === String ? String(message.App) : message.App;
+                else
+                    object.App = options.longs === String ? $util.Long.prototype.toString.call(message.App) : options.longs === Number ? new $util.LongBits(message.App.low >>> 0, message.App.high >>> 0).toNumber(true) : message.App;
+            return object;
+        };
+
+        /**
+         * Converts this Version to JSON.
+         * @function toJSON
+         * @memberof abci.Version
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Version.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Version;
+    })();
+
+    abci.BlockID = (function() {
+>>>>>>> dd91844e8be7d62556c9901244a4c8f94596028d
 
         /**
          * Properties of a Version.
