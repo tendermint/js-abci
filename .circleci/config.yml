@@ -15,6 +15,9 @@ jobs:
       - run:
           name: NPM Install standard
           command: npm install standard
+      - run:
+          name: NPM Install NYC
+          command: npm install nyc
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
