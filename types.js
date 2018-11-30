@@ -8606,8 +8606,6 @@ $root.abci = (function() {
     })();
 
     abci.Version = (function() {
-<<<<<<< HEAD
-=======
 
         /**
          * Properties of a Version.
@@ -8846,7 +8844,6 @@ $root.abci = (function() {
     })();
 
     abci.BlockID = (function() {
->>>>>>> dd91844e8be7d62556c9901244a4c8f94596028d
 
         /**
          * Properties of a Version.
