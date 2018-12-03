@@ -6,7 +6,7 @@ ABCI server for Node.js. Supports up to Tendermint version 0.19.
 
 `npm install abci`
 
-Requires Node.js v7.6+
+Requires Node.js v10.9+
 
 ```js
 let createServer = require('abci')
