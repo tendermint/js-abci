@@ -56,7 +56,7 @@ function createServer (app) {
         fail(err)
       }
     })
-    conn.on('error', err => { });
+    conn.on('error', err => {})
   })
 
   return server
