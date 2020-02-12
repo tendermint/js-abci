@@ -857,11 +857,20 @@ export namespace abci {
         public toJSON(): { [k: string]: any };
     }
 
+    /** CheckTxType enum. */
+    enum CheckTxType {
+        New = 0,
+        Recheck = 1
+    }
+
     /** Properties of a RequestCheckTx. */
     interface IRequestCheckTx {
 
         /** RequestCheckTx tx */
         tx?: (Uint8Array|null);
+
+        /** RequestCheckTx type */
+        type?: (abci.CheckTxType|null);
     }
 
     /** Represents a RequestCheckTx. */
@@ -875,6 +884,9 @@ export namespace abci {
 
         /** RequestCheckTx tx. */
         public tx: Uint8Array;
+
+        /** RequestCheckTx type. */
+        public type: abci.CheckTxType;
 
         /**
          * Creates a new RequestCheckTx instance using the specified properties.
@@ -1968,7 +1980,7 @@ export namespace abci {
         value?: (Uint8Array|null);
 
         /** ResponseQuery proof */
-        proof?: (Uint8Array|null);
+        proof?: (tendermint.crypto.merkle.IProof|null);
 
         /** ResponseQuery height */
         height?: (number|Long|null);
@@ -2005,7 +2017,7 @@ export namespace abci {
         public value: Uint8Array;
 
         /** ResponseQuery proof. */
-        public proof: Uint8Array;
+        public proof?: (tendermint.crypto.merkle.IProof|null);
 
         /** ResponseQuery height. */
         public height: (number|Long);
@@ -2087,8 +2099,8 @@ export namespace abci {
     /** Properties of a ResponseBeginBlock. */
     interface IResponseBeginBlock {
 
-        /** ResponseBeginBlock tags */
-        tags?: (common.IKVPair[]|null);
+        /** ResponseBeginBlock events */
+        events?: (abci.IEvent[]|null);
     }
 
     /** Represents a ResponseBeginBlock. */
@@ -2100,8 +2112,8 @@ export namespace abci {
          */
         constructor(properties?: abci.IResponseBeginBlock);
 
-        /** ResponseBeginBlock tags. */
-        public tags: common.IKVPair[];
+        /** ResponseBeginBlock events. */
+        public events: abci.IEvent[];
 
         /**
          * Creates a new ResponseBeginBlock instance using the specified properties.
@@ -2195,8 +2207,8 @@ export namespace abci {
         /** ResponseCheckTx gasUsed */
         gasUsed?: (number|Long|null);
 
-        /** ResponseCheckTx tags */
-        tags?: (common.IKVPair[]|null);
+        /** ResponseCheckTx events */
+        events?: (abci.IEvent[]|null);
 
         /** ResponseCheckTx codespace */
         codespace?: (string|null);
@@ -2229,8 +2241,8 @@ export namespace abci {
         /** ResponseCheckTx gasUsed. */
         public gasUsed: (number|Long);
 
-        /** ResponseCheckTx tags. */
-        public tags: common.IKVPair[];
+        /** ResponseCheckTx events. */
+        public events: abci.IEvent[];
 
         /** ResponseCheckTx codespace. */
         public codespace: string;
@@ -2327,8 +2339,8 @@ export namespace abci {
         /** ResponseDeliverTx gasUsed */
         gasUsed?: (number|Long|null);
 
-        /** ResponseDeliverTx tags */
-        tags?: (common.IKVPair[]|null);
+        /** ResponseDeliverTx events */
+        events?: (abci.IEvent[]|null);
 
         /** ResponseDeliverTx codespace */
         codespace?: (string|null);
@@ -2361,8 +2373,8 @@ export namespace abci {
         /** ResponseDeliverTx gasUsed. */
         public gasUsed: (number|Long);
 
-        /** ResponseDeliverTx tags. */
-        public tags: common.IKVPair[];
+        /** ResponseDeliverTx events. */
+        public events: abci.IEvent[];
 
         /** ResponseDeliverTx codespace. */
         public codespace: string;
@@ -2447,8 +2459,8 @@ export namespace abci {
         /** ResponseEndBlock consensusParamUpdates */
         consensusParamUpdates?: (abci.IConsensusParams|null);
 
-        /** ResponseEndBlock tags */
-        tags?: (common.IKVPair[]|null);
+        /** ResponseEndBlock events */
+        events?: (abci.IEvent[]|null);
     }
 
     /** Represents a ResponseEndBlock. */
@@ -2466,8 +2478,8 @@ export namespace abci {
         /** ResponseEndBlock consensusParamUpdates. */
         public consensusParamUpdates?: (abci.IConsensusParams|null);
 
-        /** ResponseEndBlock tags. */
-        public tags: common.IKVPair[];
+        /** ResponseEndBlock events. */
+        public events: abci.IEvent[];
 
         /**
          * Creates a new ResponseEndBlock instance using the specified properties.
@@ -2633,8 +2645,8 @@ export namespace abci {
     /** Properties of a ConsensusParams. */
     interface IConsensusParams {
 
-        /** ConsensusParams blockSize */
-        blockSize?: (abci.IBlockSizeParams|null);
+        /** ConsensusParams block */
+        block?: (abci.IBlockParams|null);
 
         /** ConsensusParams evidence */
         evidence?: (abci.IEvidenceParams|null);
@@ -2652,8 +2664,8 @@ export namespace abci {
          */
         constructor(properties?: abci.IConsensusParams);
 
-        /** ConsensusParams blockSize. */
-        public blockSize?: (abci.IBlockSizeParams|null);
+        /** ConsensusParams block. */
+        public block?: (abci.IBlockParams|null);
 
         /** ConsensusParams evidence. */
         public evidence?: (abci.IEvidenceParams|null);
@@ -2732,97 +2744,97 @@ export namespace abci {
         public toJSON(): { [k: string]: any };
     }
 
-    /** Properties of a BlockSizeParams. */
-    interface IBlockSizeParams {
+    /** Properties of a BlockParams. */
+    interface IBlockParams {
 
-        /** BlockSizeParams maxBytes */
+        /** BlockParams maxBytes */
         maxBytes?: (number|Long|null);
 
-        /** BlockSizeParams maxGas */
+        /** BlockParams maxGas */
         maxGas?: (number|Long|null);
     }
 
-    /** Represents a BlockSizeParams. */
-    class BlockSizeParams implements IBlockSizeParams {
+    /** Represents a BlockParams. */
+    class BlockParams implements IBlockParams {
 
         /**
-         * Constructs a new BlockSizeParams.
+         * Constructs a new BlockParams.
          * @param [properties] Properties to set
          */
-        constructor(properties?: abci.IBlockSizeParams);
+        constructor(properties?: abci.IBlockParams);
 
-        /** BlockSizeParams maxBytes. */
+        /** BlockParams maxBytes. */
         public maxBytes: (number|Long);
 
-        /** BlockSizeParams maxGas. */
+        /** BlockParams maxGas. */
         public maxGas: (number|Long);
 
         /**
-         * Creates a new BlockSizeParams instance using the specified properties.
+         * Creates a new BlockParams instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns BlockSizeParams instance
+         * @returns BlockParams instance
          */
-        public static create(properties?: abci.IBlockSizeParams): abci.BlockSizeParams;
+        public static create(properties?: abci.IBlockParams): abci.BlockParams;
 
         /**
-         * Encodes the specified BlockSizeParams message. Does not implicitly {@link abci.BlockSizeParams.verify|verify} messages.
-         * @param message BlockSizeParams message or plain object to encode
+         * Encodes the specified BlockParams message. Does not implicitly {@link abci.BlockParams.verify|verify} messages.
+         * @param message BlockParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: abci.IBlockSizeParams, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: abci.IBlockParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified BlockSizeParams message, length delimited. Does not implicitly {@link abci.BlockSizeParams.verify|verify} messages.
-         * @param message BlockSizeParams message or plain object to encode
+         * Encodes the specified BlockParams message, length delimited. Does not implicitly {@link abci.BlockParams.verify|verify} messages.
+         * @param message BlockParams message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: abci.IBlockSizeParams, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: abci.IBlockParams, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a BlockSizeParams message from the specified reader or buffer.
+         * Decodes a BlockParams message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns BlockSizeParams
+         * @returns BlockParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.BlockSizeParams;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.BlockParams;
 
         /**
-         * Decodes a BlockSizeParams message from the specified reader or buffer, length delimited.
+         * Decodes a BlockParams message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns BlockSizeParams
+         * @returns BlockParams
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.BlockSizeParams;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.BlockParams;
 
         /**
-         * Verifies a BlockSizeParams message.
+         * Verifies a BlockParams message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a BlockSizeParams message from a plain object. Also converts values to their respective internal types.
+         * Creates a BlockParams message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns BlockSizeParams
+         * @returns BlockParams
          */
-        public static fromObject(object: { [k: string]: any }): abci.BlockSizeParams;
+        public static fromObject(object: { [k: string]: any }): abci.BlockParams;
 
         /**
-         * Creates a plain object from a BlockSizeParams message. Also converts values to other types if specified.
-         * @param message BlockSizeParams
+         * Creates a plain object from a BlockParams message. Also converts values to other types if specified.
+         * @param message BlockParams
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: abci.BlockSizeParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: abci.BlockParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this BlockSizeParams to JSON.
+         * Converts this BlockParams to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
@@ -2831,8 +2843,11 @@ export namespace abci {
     /** Properties of an EvidenceParams. */
     interface IEvidenceParams {
 
-        /** EvidenceParams maxAge */
-        maxAge?: (number|Long|null);
+        /** EvidenceParams maxAgeNumBlocks */
+        maxAgeNumBlocks?: (number|Long|null);
+
+        /** EvidenceParams maxAgeDuration */
+        maxAgeDuration?: (google.protobuf.IDuration|null);
     }
 
     /** Represents an EvidenceParams. */
@@ -2844,8 +2859,11 @@ export namespace abci {
          */
         constructor(properties?: abci.IEvidenceParams);
 
-        /** EvidenceParams maxAge. */
-        public maxAge: (number|Long);
+        /** EvidenceParams maxAgeNumBlocks. */
+        public maxAgeNumBlocks: (number|Long);
+
+        /** EvidenceParams maxAgeDuration. */
+        public maxAgeDuration?: (google.protobuf.IDuration|null);
 
         /**
          * Creates a new EvidenceParams instance using the specified properties.
@@ -3104,6 +3122,102 @@ export namespace abci {
         public toJSON(): { [k: string]: any };
     }
 
+    /** Properties of an Event. */
+    interface IEvent {
+
+        /** Event type */
+        type?: (string|null);
+
+        /** Event attributes */
+        attributes?: (tendermint.libs.kv.IPair[]|null);
+    }
+
+    /** Represents an Event. */
+    class Event implements IEvent {
+
+        /**
+         * Constructs a new Event.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: abci.IEvent);
+
+        /** Event type. */
+        public type: string;
+
+        /** Event attributes. */
+        public attributes: tendermint.libs.kv.IPair[];
+
+        /**
+         * Creates a new Event instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Event instance
+         */
+        public static create(properties?: abci.IEvent): abci.Event;
+
+        /**
+         * Encodes the specified Event message. Does not implicitly {@link abci.Event.verify|verify} messages.
+         * @param message Event message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: abci.IEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Event message, length delimited. Does not implicitly {@link abci.Event.verify|verify} messages.
+         * @param message Event message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: abci.IEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an Event message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Event
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): abci.Event;
+
+        /**
+         * Decodes an Event message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Event
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): abci.Event;
+
+        /**
+         * Verifies an Event message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an Event message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Event
+         */
+        public static fromObject(object: { [k: string]: any }): abci.Event;
+
+        /**
+         * Creates a plain object from an Event message. Also converts values to other types if specified.
+         * @param message Event
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: abci.Event, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Event to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
     /** Properties of a Header. */
     interface IHeader {
 
@@ -3118,12 +3232,6 @@ export namespace abci {
 
         /** Header time */
         time?: (google.protobuf.ITimestamp|null);
-
-        /** Header numTxs */
-        numTxs?: (number|Long|null);
-
-        /** Header totalTxs */
-        totalTxs?: (number|Long|null);
 
         /** Header lastBlockId */
         lastBlockId?: (abci.IBlockID|null);
@@ -3176,12 +3284,6 @@ export namespace abci {
 
         /** Header time. */
         public time?: (google.protobuf.ITimestamp|null);
-
-        /** Header numTxs. */
-        public numTxs: (number|Long);
-
-        /** Header totalTxs. */
-        public totalTxs: (number|Long);
 
         /** Header lastBlockId. */
         public lastBlockId?: (abci.IBlockID|null);
@@ -5971,6 +6073,12 @@ export namespace google {
 
             /** FileOptions .gogoproto.messagenameAll */
             ".gogoproto.messagenameAll"?: (boolean|null);
+
+            /** FileOptions .gogoproto.goprotoSizecacheAll */
+            ".gogoproto.goprotoSizecacheAll"?: (boolean|null);
+
+            /** FileOptions .gogoproto.goprotoUnkeyedAll */
+            ".gogoproto.goprotoUnkeyedAll"?: (boolean|null);
         }
 
         /** Represents a FileOptions. */
@@ -6209,6 +6317,12 @@ export namespace google {
 
             /** MessageOptions .gogoproto.messagename */
             ".gogoproto.messagename"?: (boolean|null);
+
+            /** MessageOptions .gogoproto.goprotoSizecache */
+            ".gogoproto.goprotoSizecache"?: (boolean|null);
+
+            /** MessageOptions .gogoproto.goprotoUnkeyed */
+            ".gogoproto.goprotoUnkeyed"?: (boolean|null);
         }
 
         /** Represents a MessageOptions. */
@@ -6362,6 +6476,12 @@ export namespace google {
 
             /** FieldOptions .gogoproto.stdduration */
             ".gogoproto.stdduration"?: (boolean|null);
+
+            /** FieldOptions .gogoproto.wktpointer */
+            ".gogoproto.wktpointer"?: (boolean|null);
+
+            /** FieldOptions .gogoproto.castrepeated */
+            ".gogoproto.castrepeated"?: (string|null);
         }
 
         /** Represents a FieldOptions. */
@@ -7629,6 +7749,102 @@ export namespace google {
             }
         }
 
+        /** Properties of a Duration. */
+        interface IDuration {
+
+            /** Duration seconds */
+            seconds?: (number|Long|null);
+
+            /** Duration nanos */
+            nanos?: (number|null);
+        }
+
+        /** Represents a Duration. */
+        class Duration implements IDuration {
+
+            /**
+             * Constructs a new Duration.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IDuration);
+
+            /** Duration seconds. */
+            public seconds: (number|Long);
+
+            /** Duration nanos. */
+            public nanos: number;
+
+            /**
+             * Creates a new Duration instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Duration instance
+             */
+            public static create(properties?: google.protobuf.IDuration): google.protobuf.Duration;
+
+            /**
+             * Encodes the specified Duration message. Does not implicitly {@link google.protobuf.Duration.verify|verify} messages.
+             * @param message Duration message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IDuration, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Duration message, length delimited. Does not implicitly {@link google.protobuf.Duration.verify|verify} messages.
+             * @param message Duration message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: google.protobuf.IDuration, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Duration message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Duration
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.Duration;
+
+            /**
+             * Decodes a Duration message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Duration
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.Duration;
+
+            /**
+             * Verifies a Duration message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Duration message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Duration
+             */
+            public static fromObject(object: { [k: string]: any }): google.protobuf.Duration;
+
+            /**
+             * Creates a plain object from a Duration message. Also converts values to other types if specified.
+             * @param message Duration
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: google.protobuf.Duration, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Duration to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
         /** Properties of a Timestamp. */
         interface ITimestamp {
 
@@ -7727,198 +7943,406 @@ export namespace google {
     }
 }
 
-/** Namespace common. */
-export namespace common {
+/** Namespace tendermint. */
+export namespace tendermint {
 
-    /** Properties of a KVPair. */
-    interface IKVPair {
+    /** Namespace crypto. */
+    namespace crypto {
 
-        /** KVPair key */
-        key?: (Uint8Array|null);
+        /** Namespace merkle. */
+        namespace merkle {
 
-        /** KVPair value */
-        value?: (Uint8Array|null);
+            /** Properties of a ProofOp. */
+            interface IProofOp {
+
+                /** ProofOp type */
+                type?: (string|null);
+
+                /** ProofOp key */
+                key?: (Uint8Array|null);
+
+                /** ProofOp data */
+                data?: (Uint8Array|null);
+            }
+
+            /** Represents a ProofOp. */
+            class ProofOp implements IProofOp {
+
+                /**
+                 * Constructs a new ProofOp.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: tendermint.crypto.merkle.IProofOp);
+
+                /** ProofOp type. */
+                public type: string;
+
+                /** ProofOp key. */
+                public key: Uint8Array;
+
+                /** ProofOp data. */
+                public data: Uint8Array;
+
+                /**
+                 * Creates a new ProofOp instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ProofOp instance
+                 */
+                public static create(properties?: tendermint.crypto.merkle.IProofOp): tendermint.crypto.merkle.ProofOp;
+
+                /**
+                 * Encodes the specified ProofOp message. Does not implicitly {@link tendermint.crypto.merkle.ProofOp.verify|verify} messages.
+                 * @param message ProofOp message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: tendermint.crypto.merkle.IProofOp, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified ProofOp message, length delimited. Does not implicitly {@link tendermint.crypto.merkle.ProofOp.verify|verify} messages.
+                 * @param message ProofOp message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: tendermint.crypto.merkle.IProofOp, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ProofOp message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ProofOp
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tendermint.crypto.merkle.ProofOp;
+
+                /**
+                 * Decodes a ProofOp message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns ProofOp
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tendermint.crypto.merkle.ProofOp;
+
+                /**
+                 * Verifies a ProofOp message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a ProofOp message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns ProofOp
+                 */
+                public static fromObject(object: { [k: string]: any }): tendermint.crypto.merkle.ProofOp;
+
+                /**
+                 * Creates a plain object from a ProofOp message. Also converts values to other types if specified.
+                 * @param message ProofOp
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: tendermint.crypto.merkle.ProofOp, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this ProofOp to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+
+            /** Properties of a Proof. */
+            interface IProof {
+
+                /** Proof ops */
+                ops?: (tendermint.crypto.merkle.IProofOp[]|null);
+            }
+
+            /** Represents a Proof. */
+            class Proof implements IProof {
+
+                /**
+                 * Constructs a new Proof.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: tendermint.crypto.merkle.IProof);
+
+                /** Proof ops. */
+                public ops: tendermint.crypto.merkle.IProofOp[];
+
+                /**
+                 * Creates a new Proof instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Proof instance
+                 */
+                public static create(properties?: tendermint.crypto.merkle.IProof): tendermint.crypto.merkle.Proof;
+
+                /**
+                 * Encodes the specified Proof message. Does not implicitly {@link tendermint.crypto.merkle.Proof.verify|verify} messages.
+                 * @param message Proof message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: tendermint.crypto.merkle.IProof, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Proof message, length delimited. Does not implicitly {@link tendermint.crypto.merkle.Proof.verify|verify} messages.
+                 * @param message Proof message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: tendermint.crypto.merkle.IProof, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Proof message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Proof
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tendermint.crypto.merkle.Proof;
+
+                /**
+                 * Decodes a Proof message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Proof
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tendermint.crypto.merkle.Proof;
+
+                /**
+                 * Verifies a Proof message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Proof message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Proof
+                 */
+                public static fromObject(object: { [k: string]: any }): tendermint.crypto.merkle.Proof;
+
+                /**
+                 * Creates a plain object from a Proof message. Also converts values to other types if specified.
+                 * @param message Proof
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: tendermint.crypto.merkle.Proof, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Proof to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+        }
     }
 
-    /** Represents a KVPair. */
-    class KVPair implements IKVPair {
+    /** Namespace libs. */
+    namespace libs {
 
-        /**
-         * Constructs a new KVPair.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: common.IKVPair);
+        /** Namespace kv. */
+        namespace kv {
 
-        /** KVPair key. */
-        public key: Uint8Array;
+            /** Properties of a Pair. */
+            interface IPair {
 
-        /** KVPair value. */
-        public value: Uint8Array;
+                /** Pair key */
+                key?: (Uint8Array|null);
 
-        /**
-         * Creates a new KVPair instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns KVPair instance
-         */
-        public static create(properties?: common.IKVPair): common.KVPair;
+                /** Pair value */
+                value?: (Uint8Array|null);
+            }
 
-        /**
-         * Encodes the specified KVPair message. Does not implicitly {@link common.KVPair.verify|verify} messages.
-         * @param message KVPair message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: common.IKVPair, writer?: $protobuf.Writer): $protobuf.Writer;
+            /** Represents a Pair. */
+            class Pair implements IPair {
 
-        /**
-         * Encodes the specified KVPair message, length delimited. Does not implicitly {@link common.KVPair.verify|verify} messages.
-         * @param message KVPair message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: common.IKVPair, writer?: $protobuf.Writer): $protobuf.Writer;
+                /**
+                 * Constructs a new Pair.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: tendermint.libs.kv.IPair);
 
-        /**
-         * Decodes a KVPair message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns KVPair
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): common.KVPair;
+                /** Pair key. */
+                public key: Uint8Array;
 
-        /**
-         * Decodes a KVPair message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns KVPair
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): common.KVPair;
+                /** Pair value. */
+                public value: Uint8Array;
 
-        /**
-         * Verifies a KVPair message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
+                /**
+                 * Creates a new Pair instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Pair instance
+                 */
+                public static create(properties?: tendermint.libs.kv.IPair): tendermint.libs.kv.Pair;
 
-        /**
-         * Creates a KVPair message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns KVPair
-         */
-        public static fromObject(object: { [k: string]: any }): common.KVPair;
+                /**
+                 * Encodes the specified Pair message. Does not implicitly {@link tendermint.libs.kv.Pair.verify|verify} messages.
+                 * @param message Pair message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: tendermint.libs.kv.IPair, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Creates a plain object from a KVPair message. Also converts values to other types if specified.
-         * @param message KVPair
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: common.KVPair, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                /**
+                 * Encodes the specified Pair message, length delimited. Does not implicitly {@link tendermint.libs.kv.Pair.verify|verify} messages.
+                 * @param message Pair message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: tendermint.libs.kv.IPair, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Converts this KVPair to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
+                /**
+                 * Decodes a Pair message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Pair
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tendermint.libs.kv.Pair;
 
-    /** Properties of a KI64Pair. */
-    interface IKI64Pair {
+                /**
+                 * Decodes a Pair message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Pair
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tendermint.libs.kv.Pair;
 
-        /** KI64Pair key */
-        key?: (Uint8Array|null);
+                /**
+                 * Verifies a Pair message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
 
-        /** KI64Pair value */
-        value?: (number|Long|null);
-    }
+                /**
+                 * Creates a Pair message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Pair
+                 */
+                public static fromObject(object: { [k: string]: any }): tendermint.libs.kv.Pair;
 
-    /** Represents a KI64Pair. */
-    class KI64Pair implements IKI64Pair {
+                /**
+                 * Creates a plain object from a Pair message. Also converts values to other types if specified.
+                 * @param message Pair
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: tendermint.libs.kv.Pair, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
-        /**
-         * Constructs a new KI64Pair.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: common.IKI64Pair);
+                /**
+                 * Converts this Pair to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
 
-        /** KI64Pair key. */
-        public key: Uint8Array;
+            /** Properties of a KI64Pair. */
+            interface IKI64Pair {
 
-        /** KI64Pair value. */
-        public value: (number|Long);
+                /** KI64Pair key */
+                key?: (Uint8Array|null);
 
-        /**
-         * Creates a new KI64Pair instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns KI64Pair instance
-         */
-        public static create(properties?: common.IKI64Pair): common.KI64Pair;
+                /** KI64Pair value */
+                value?: (number|Long|null);
+            }
 
-        /**
-         * Encodes the specified KI64Pair message. Does not implicitly {@link common.KI64Pair.verify|verify} messages.
-         * @param message KI64Pair message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: common.IKI64Pair, writer?: $protobuf.Writer): $protobuf.Writer;
+            /** Represents a KI64Pair. */
+            class KI64Pair implements IKI64Pair {
 
-        /**
-         * Encodes the specified KI64Pair message, length delimited. Does not implicitly {@link common.KI64Pair.verify|verify} messages.
-         * @param message KI64Pair message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: common.IKI64Pair, writer?: $protobuf.Writer): $protobuf.Writer;
+                /**
+                 * Constructs a new KI64Pair.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: tendermint.libs.kv.IKI64Pair);
 
-        /**
-         * Decodes a KI64Pair message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns KI64Pair
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): common.KI64Pair;
+                /** KI64Pair key. */
+                public key: Uint8Array;
 
-        /**
-         * Decodes a KI64Pair message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns KI64Pair
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): common.KI64Pair;
+                /** KI64Pair value. */
+                public value: (number|Long);
 
-        /**
-         * Verifies a KI64Pair message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
+                /**
+                 * Creates a new KI64Pair instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns KI64Pair instance
+                 */
+                public static create(properties?: tendermint.libs.kv.IKI64Pair): tendermint.libs.kv.KI64Pair;
 
-        /**
-         * Creates a KI64Pair message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns KI64Pair
-         */
-        public static fromObject(object: { [k: string]: any }): common.KI64Pair;
+                /**
+                 * Encodes the specified KI64Pair message. Does not implicitly {@link tendermint.libs.kv.KI64Pair.verify|verify} messages.
+                 * @param message KI64Pair message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: tendermint.libs.kv.IKI64Pair, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Creates a plain object from a KI64Pair message. Also converts values to other types if specified.
-         * @param message KI64Pair
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: common.KI64Pair, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                /**
+                 * Encodes the specified KI64Pair message, length delimited. Does not implicitly {@link tendermint.libs.kv.KI64Pair.verify|verify} messages.
+                 * @param message KI64Pair message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: tendermint.libs.kv.IKI64Pair, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Converts this KI64Pair to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
+                /**
+                 * Decodes a KI64Pair message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns KI64Pair
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): tendermint.libs.kv.KI64Pair;
+
+                /**
+                 * Decodes a KI64Pair message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns KI64Pair
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): tendermint.libs.kv.KI64Pair;
+
+                /**
+                 * Verifies a KI64Pair message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a KI64Pair message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns KI64Pair
+                 */
+                public static fromObject(object: { [k: string]: any }): tendermint.libs.kv.KI64Pair;
+
+                /**
+                 * Creates a plain object from a KI64Pair message. Also converts values to other types if specified.
+                 * @param message KI64Pair
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: tendermint.libs.kv.KI64Pair, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this KI64Pair to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+        }
     }
 }
