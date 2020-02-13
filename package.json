@@ -1,6 +1,6 @@
 {
   "name": "abci",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "Tendermint ABCI server",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "devDependencies": {
     "ava": "^0.25.0",
     "get-port": "^3.2.0",
-    "nyc": "^13.1.0",
+    "nyc": "^15.0.0",
     "standard": "^11.0.1",
     "tempy": "^0.2.1",
     "tendermint-node": "^4.0.0"
