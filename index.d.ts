@@ -2557,6 +2557,9 @@ export namespace abci {
 
         /** ResponseCommit data */
         data?: (Uint8Array|null);
+
+        /** ResponseCommit retainHeight */
+        retainHeight?: (number|Long|null);
     }
 
     /** Represents a ResponseCommit. */
@@ -2570,6 +2573,9 @@ export namespace abci {
 
         /** ResponseCommit data. */
         public data: Uint8Array;
+
+        /** ResponseCommit retainHeight. */
+        public retainHeight: (number|Long);
 
         /**
          * Creates a new ResponseCommit instance using the specified properties.

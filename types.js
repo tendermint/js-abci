@@ -6690,6 +6690,7 @@ $root.abci = (function() {
          * @memberof abci
          * @interface IResponseCommit
          * @property {Uint8Array|null} [data] ResponseCommit data
+         * @property {number|Long|null} [retainHeight] ResponseCommit retainHeight
          */
 
         /**
@@ -6714,6 +6715,14 @@ $root.abci = (function() {
          * @instance
          */
         ResponseCommit.prototype.data = $util.newBuffer([]);
+
+        /**
+         * ResponseCommit retainHeight.
+         * @member {number|Long} retainHeight
+         * @memberof abci.ResponseCommit
+         * @instance
+         */
+        ResponseCommit.prototype.retainHeight = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
         /**
          * Creates a new ResponseCommit instance using the specified properties.
@@ -6741,6 +6750,8 @@ $root.abci = (function() {
                 writer = $Writer.create();
             if (message.data != null && message.hasOwnProperty("data"))
                 writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.data);
+            if (message.retainHeight != null && message.hasOwnProperty("retainHeight"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int64(message.retainHeight);
             return writer;
         };
 
@@ -6777,6 +6788,9 @@ $root.abci = (function() {
                 switch (tag >>> 3) {
                 case 2:
                     message.data = reader.bytes();
+                    break;
+                case 3:
+                    message.retainHeight = reader.int64();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -6816,6 +6830,9 @@ $root.abci = (function() {
             if (message.data != null && message.hasOwnProperty("data"))
                 if (!(message.data && typeof message.data.length === "number" || $util.isString(message.data)))
                     return "data: buffer expected";
+            if (message.retainHeight != null && message.hasOwnProperty("retainHeight"))
+                if (!$util.isInteger(message.retainHeight) && !(message.retainHeight && $util.isInteger(message.retainHeight.low) && $util.isInteger(message.retainHeight.high)))
+                    return "retainHeight: integer|Long expected";
             return null;
         };
 
@@ -6836,6 +6853,15 @@ $root.abci = (function() {
                     $util.base64.decode(object.data, message.data = $util.newBuffer($util.base64.length(object.data)), 0);
                 else if (object.data.length)
                     message.data = object.data;
+            if (object.retainHeight != null)
+                if ($util.Long)
+                    (message.retainHeight = $util.Long.fromValue(object.retainHeight)).unsigned = false;
+                else if (typeof object.retainHeight === "string")
+                    message.retainHeight = parseInt(object.retainHeight, 10);
+                else if (typeof object.retainHeight === "number")
+                    message.retainHeight = object.retainHeight;
+                else if (typeof object.retainHeight === "object")
+                    message.retainHeight = new $util.LongBits(object.retainHeight.low >>> 0, object.retainHeight.high >>> 0).toNumber();
             return message;
         };
 
@@ -6852,7 +6878,7 @@ $root.abci = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 if (options.bytes === String)
                     object.data = "";
                 else {
@@ -6860,8 +6886,19 @@ $root.abci = (function() {
                     if (options.bytes !== Array)
                         object.data = $util.newBuffer(object.data);
                 }
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.retainHeight = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.retainHeight = options.longs === String ? "0" : 0;
+            }
             if (message.data != null && message.hasOwnProperty("data"))
                 object.data = options.bytes === String ? $util.base64.encode(message.data, 0, message.data.length) : options.bytes === Array ? Array.prototype.slice.call(message.data) : message.data;
+            if (message.retainHeight != null && message.hasOwnProperty("retainHeight"))
+                if (typeof message.retainHeight === "number")
+                    object.retainHeight = options.longs === String ? String(message.retainHeight) : message.retainHeight;
+                else
+                    object.retainHeight = options.longs === String ? $util.Long.prototype.toString.call(message.retainHeight) : options.longs === Number ? new $util.LongBits(message.retainHeight.low >>> 0, message.retainHeight.high >>> 0).toNumber() : message.retainHeight;
             return object;
         };
 
