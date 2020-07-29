@@ -56,6 +56,7 @@ function createServer (app) {
         fail(err)
       }
     })
+    conn.on('error', () => { /* by this point the conn.stream is destroyed, nothing else to do !! */ })
   })
 
   return server
