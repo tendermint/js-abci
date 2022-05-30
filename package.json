@@ -1,11 +1,11 @@
 {
   "name": "abci",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Tendermint ABCI server",
   "main": "index.js",
   "scripts": {
     "test": "standard src/*.js test/*.js && nyc ava test/connection.js test/server.js test/integration.js",
-    "build": "pbjs -t static-module -w commonjs -o types.js proto/*.proto && pbts -o index.d.ts types.js"
+    "build": "pbjs -t static-module -w commonjs -o types.js proto/**/*.proto && pbts -o index.d.ts types.js"
   },
   "keywords": [
     "abci",
@@ -22,12 +22,12 @@
     "protocol-buffers-encodings": "^1.1.0"
   },
   "devDependencies": {
-    "ava": "^3.10.1",
+    "ava": "^0.25.0",
     "get-port": "^3.2.0",
-    "nyc": "^15.0.0",
+    "nyc": "^13.1.0",
     "standard": "^11.0.1",
     "tempy": "^0.2.1",
-    "tendermint-node": "^5.2.0"
+    "tendermint-node": "^4.0.0"
   },
   "directories": {
     "example": "example",
