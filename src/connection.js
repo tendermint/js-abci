@@ -4,7 +4,7 @@ const EventEmitter = require('events')
 const BufferList = require('bl')
 const debug = require('debug')('abci')
 const { varint } = require('protocol-buffers-encodings')
-const { Request, Response } = require('../types.js').abci
+const { Request, Response } = require('../types.js').tendermint.abci
 
 const MAX_MESSAGE_SIZE = 104857600 // 100mb
 

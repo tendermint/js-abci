@@ -1,11 +1,11 @@
 {
   "name": "abci",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Tendermint ABCI server",
   "main": "index.js",
   "scripts": {
     "test": "standard src/*.js test/*.js && nyc ava test/connection.js test/server.js test/integration.js",
-    "build": "pbjs -t static-module -w commonjs -o types.js proto/*.proto && pbts -o index.d.ts types.js"
+    "build": "pbjs -t static-module -w commonjs -o types.js proto/**/*.proto && pbts -o index.d.ts types.js"
   },
   "keywords": [
     "abci",
