@@ -1,5 +1,5 @@
 {
-  "name": "@trivo/abci",
+  "name": "abci",
   "version": "7.0.1",
   "description": "Tendermint ABCI server",
   "main": "index.js",
