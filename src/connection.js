@@ -66,7 +66,7 @@ class Connection extends EventEmitter {
       this.waiting = false
       this.stream.resume()
 
-      if (this.recvBuf.length > 0) {
+      if (this.recvBuf.length >= 3) { 
         this.maybeReadNextMessage()
       }
     })
